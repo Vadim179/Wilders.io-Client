@@ -1,0 +1,134 @@
+@font-face {
+  font-family: slackey;
+  src: url("../assets/fonts/slackey.ttf");
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: #9ab855;
+}
+
+.canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+}
+
+.main-menu {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.main-menu__logo {
+  margin-bottom: 20px;
+}
+
+.main-menu__controls {
+  width: 400px;
+  padding: 20px;
+  position: relative;
+
+  background: #473b42;
+  border-radius: 20px;
+  border: 5px #3d7554 solid;
+
+  display: grid;
+  grid-template-areas:
+    "a a b"
+    "c c c";
+  grid-gap: 20px;
+}
+
+.main-menu__controls__input,
+.main-menu__controls__server-select,
+.main-menu__controls__play-button {
+  appearance: none;
+  outline: none;
+  border: none;
+
+  height: 30px;
+  border-radius: 5px;
+
+  color: #ffffff;
+  font-family: slackey;
+  box-shadow: inset 0 0px 5px rgba(0, 0, 0, 0.5);
+}
+
+.main-menu__controls__input {
+  grid-area: a;
+  padding: 0 10px;
+  background: #7a5965;
+}
+
+.main-menu__controls__input::placeholder {
+  color: #977c86;
+}
+
+.main-menu__controls__server-select {
+  grid-area: b;
+  text-align: center;
+  background: #7a5965;
+}
+
+.main-menu__controls__play-button {
+  grid-area: c;
+  background: #2199e8;
+  transition: background 0.5s;
+  cursor: pointer;
+}
+
+.main-menu__controls__play-button:hover {
+  background: #33a9f8;
+}
+
+.main-menu__controls__play-button:disabled {
+  background: #A2B5BB;
+  cursor: default;
+}
+
+.main-menu__loader,
+.main-menu__notification {
+  display: none;
+
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+}
+
+.main-menu__loader {
+  width: 40px;
+  height: 40px;
+  translate: -50% 80px;
+
+  -moz-animation: spin 2s linear infinite;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  100% {
+    rotate: 360deg;
+  }
+}
+
+.main-menu__notification {
+  width: 100%;
+  translate: -50% 70px;
+
+  text-align: center;
+  font-family: slackey;
+  color: #ffffff;
+}
