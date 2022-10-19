@@ -1,6 +1,6 @@
 import { Socket } from "socket.io-client"
+import { PhaserGameConfig, Assets, Map } from "./config"
 import { EntityFactory } from "./Entities"
-import { PhaserGameConfig, Assets } from "./config"
 
 export async function initializeGame(username: string, socket: Socket) {
   new Phaser.Game({
@@ -17,6 +17,10 @@ export async function initializeGame(username: string, socket: Socket) {
   let wilder: ReturnType<typeof EntityFactory.Wilder> | null = null
 
   function create() {
+    Map.environment.forEach(({ type, x, y }) => {
+      EntityFactory[type]({ scene: this, x, y })
+    })
+
     wilder = EntityFactory.Wilder({ scene: this, username, x: 0, y: 0 })
     this.cameras.main.startFollow(wilder, true)
 

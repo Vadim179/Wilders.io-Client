@@ -21,7 +21,7 @@ class Sprite extends Phaser.GameObjects.Sprite {
     shadow.setPosition(this.x + 10, this.y + 10)
     shadow.setDepth(this.depth - 1)
 
-    this.scene.add.existing(this)
+    this.scene.add.existing(shadow)
     return this
   }
 
