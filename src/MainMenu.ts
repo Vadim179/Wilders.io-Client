@@ -88,8 +88,10 @@ export function initializeMainMenu() {
     })
 
     socket.once("connect", () => {
-      hideMenu()
-      initializeGame(username, socket as Socket)
+      socket.once("i", ({ x, y }) => {
+        hideMenu()
+        initializeGame(username, x, y, socket as Socket)
+      })
     })
   })
 }

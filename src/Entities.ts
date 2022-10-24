@@ -34,56 +34,62 @@ interface IWilderConstructorParams
 }
 
 class Wilder extends Phaser.GameObjects.Container {
+  targetX = 0
+  targetY = 0
+  positionTween: Phaser.Tweens.Tween
+
   usernameTextOffset = { x: 0, y: -80 }
-  usernameText: Phaser.GameObjects.Text | null = null
+  usernameText: Phaser.GameObjects.Text
+
+  bodySprite: Phaser.GameObjects.Sprite
+
+  armSpriteOffset = { x: 50, y: -30 }
+  leftArmTargetOffset = { x: 50, y: -30 }
+  leftArmSprite: Phaser.GameObjects.Sprite
+  leftArmPositionTween: Phaser.Tweens.Tween
+
+  rightArmTargetOffset = { x: -50, y: -30 }
+  rightArmSprite: Phaser.GameObjects.Sprite
+  rightArmPositionTween: Phaser.Tweens.Tween
 
   constructor({ scene, x, y, username }: IWilderConstructorParams) {
     super(scene, x, y, [])
 
+    this.targetX = x
+    this.targetY = y
+
     this.render()
-    this.renderUsername(username)
+    // this.renderUsername(username)
 
     this.scene.add.existing(this)
-  }
-
-  update() {
-    const { usernameText, usernameTextOffset, x, y } = this
-
-    if (usernameText) {
-      const usernameTextX = x + usernameTextOffset.x
-      const usernameTextY = y + usernameTextOffset.y
-      usernameText.setPosition(usernameTextX, usernameTextY)
-    }
+    this.start()
   }
 
   render() {
-    const { scene } = this
+    const { scene, armSpriteOffset } = this
 
-    const armY = -30
-    const armX = 50
-
-    const leftArm = new Sprite({
+    this.rightArmSprite = new Sprite({
       scene,
       texture: "WilderLeftArm",
-      x: -armX,
-      y: armY,
+      x: -armSpriteOffset.x,
+      y: armSpriteOffset.y,
     })
 
-    const rightArm = new Sprite({
+    this.leftArmSprite = new Sprite({
       scene,
       texture: "WilderRightArm",
-      x: armX,
-      y: armY,
+      x: armSpriteOffset.x,
+      y: armSpriteOffset.y,
     })
 
-    const body = new Sprite({
+    this.bodySprite = new Sprite({
       scene,
       texture: "Wilder",
       x: 0,
       y: 0,
     })
 
-    this.add([leftArm, rightArm, body])
+    this.add([this.leftArmSprite, this.rightArmSprite, this.bodySprite])
   }
 
   renderUsername(username: string) {
@@ -108,6 +114,83 @@ class Wilder extends Phaser.GameObjects.Container {
 
     scene.add.existing(usernameText)
     this.usernameText = usernameText
+  }
+
+  start() {
+    const { scene, armSpriteOffset } = this
+
+    this.positionTween = scene.tweens.add({
+      targets: this,
+      x: 0,
+      y: 0,
+      ease: "Linear",
+      duration: 300,
+    })
+
+    this.leftArmPositionTween = scene.tweens.add({
+      targets: this.leftArmSprite,
+      x: armSpriteOffset.x,
+      y: armSpriteOffset.y,
+      ease: "Linear",
+      duration: 200,
+    })
+
+    this.rightArmPositionTween = scene.tweens.add({
+      targets: this.rightArmSprite,
+      x: -armSpriteOffset.x,
+      y: armSpriteOffset.y,
+      ease: "Linear",
+      duration: 200,
+    })
+  }
+
+  update() {
+    const {
+      positionTween,
+      leftArmPositionTween,
+      leftArmTargetOffset,
+      rightArmPositionTween,
+      rightArmTargetOffset,
+      targetX,
+      targetY,
+      x,
+      y,
+    } = this
+
+    positionTween.updateTo("x", targetX, true)
+    positionTween.updateTo("y", targetY, true)
+    positionTween.restart()
+
+    leftArmPositionTween.updateTo("x", leftArmTargetOffset.x, true)
+    leftArmPositionTween.updateTo("y", leftArmTargetOffset.y, true)
+    leftArmPositionTween.restart()
+
+    rightArmPositionTween.updateTo("x", rightArmTargetOffset.x, true)
+    rightArmPositionTween.updateTo("y", rightArmTargetOffset.y, true)
+    rightArmPositionTween.restart()
+  }
+
+  attackWithLeftArm = true
+  attack() {
+    if (this.attackWithLeftArm) {
+      this.leftArmTargetOffset = { x: 0, y: -70 }
+      this.rightArmTargetOffset = { x: -60, y: -10 }
+
+      setTimeout(() => {
+        this.leftArmTargetOffset = { x: 50, y: -30 }
+        this.rightArmTargetOffset = { x: -50, y: -30 }
+      }, 300)
+    } else {
+      this.rightArmTargetOffset = { x: 0, y: -70 }
+      this.leftArmTargetOffset = { x: 60, y: -10 }
+
+      setTimeout(() => {
+        this.rightArmTargetOffset = { x: -50, y: -30 }
+        this.leftArmTargetOffset = { x: 50, y: -30 }
+      }, 300)
+    }
+
+    this.attackWithLeftArm = !this.attackWithLeftArm
   }
 }
 

@@ -1,12 +1,18 @@
 export const PhaserGameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.WEBGL,
+  autoFocus: true,
   disableContextMenu: true,
   backgroundColor: "#9ab855",
+  fps: {
+    min: 30,
+    target: 120,
+    smoothStep: true,
+  },
   render: {
-    antialias: true,
     roundPixels: true,
+    antialias: true,
     antialiasGL: true,
-    transparent: true,
+    powerPreference: "high-performance",
   },
   scale: {
     mode: Phaser.Scale.RESIZE,

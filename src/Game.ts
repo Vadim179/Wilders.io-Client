@@ -2,7 +2,12 @@ import { Socket } from "socket.io-client"
 import { PhaserGameConfig, Assets, Map } from "./config"
 import { EntityFactory } from "./Entities"
 
-export async function initializeGame(username: string, socket: Socket) {
+export async function initializeGame(
+  username: string,
+  spawnX: number,
+  spawnY: number,
+  socket: Socket,
+) {
   new Phaser.Game({
     ...PhaserGameConfig,
     scene: { preload, create, update },
@@ -17,12 +22,14 @@ export async function initializeGame(username: string, socket: Socket) {
   let wilder: ReturnType<typeof EntityFactory.Wilder> | null = null
 
   function create() {
-    Map.environment.forEach(({ type, x, y }) => {
-      EntityFactory[type]({ scene: this, x, y })
+    Map.entities.forEach(({ id, x, y }) => {
+      EntityFactory[id]({ scene: this, x, y })
     })
 
-    wilder = EntityFactory.Wilder({ scene: this, username, x: 0, y: 0 })
-    this.cameras.main.startFollow(wilder, true)
+    wilder = EntityFactory.Wilder({ scene: this, username, x: spawnX, y: spawnY })
+    this.cameras.main.startFollow(wilder, false)
+
+    // this.cameras.main.startFollow(wilder, false)
 
     // Movement
     const keyboardInput = {
@@ -68,29 +75,38 @@ export async function initializeGame(username: string, socket: Socket) {
     })
 
     // Attack
-    let attacking = false
 
     window.addEventListener("mousedown", () => {
-      attacking = true
-      socket.emit("a", attacking)
+      socket.emit("a", true)
     })
 
     window.addEventListener("mouseup", () => {
-      attacking = false
-      socket.emit("a", attacking)
+      socket.emit("a", false)
     })
 
     // Rotation
     let rotation = 0
+    let _previousRotation = 0
 
     window.addEventListener("mousemove", ({ clientX, clientY }) => {
-      const wilderX = innerWidth / 2
-      const wilderY = innerHeight / 2
-
-      rotation = Math.atan2(clientX - wilderX, -(clientY - wilderY))
+      rotation = Math.atan2(clientX - innerWidth / 2, -(clientY - innerHeight / 2))
       wilder.setRotation(rotation)
+    })
 
+    setInterval(() => {
+      if (_previousRotation === rotation) return
       socket.emit("r", rotation)
+      _previousRotation = rotation
+    }, 200)
+
+    socket.on("a", () => {
+      console.log("GOT HERE")
+      wilder.attack()
+    })
+
+    socket.on("d", ({ x, y, r }) => {
+      wilder.targetX = x
+      wilder.targetY = y
     })
   }
 
