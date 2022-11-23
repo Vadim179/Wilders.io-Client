@@ -1,3 +1,3 @@
-export { Assets } from "./Assets"
-export { Map } from "./Map"
-export { PhaserGameConfig } from "./PhaserConfig"
+export { Assets } from "./Assets";
+export { MapEntities, EntitiesRenderingOrder } from "./MapEntities";
+export { PhaserGameConfig } from "./PhaserConfig";
