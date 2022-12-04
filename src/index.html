@@ -1,35 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-  <link rel="stylesheet" hrsef="styles.css" />
-  <title>
-    <%= htmlWebpackPlugin.options.title %>
-  </title>
-</head>
-<body>
-  <!-- Game Canvas -->
-  <canvas class="canvas"></canvas>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+    />
+    <link rel="stylesheet" hrsef="styles.css" />
+    <title><%= htmlWebpackPlugin.options.title %></title>
+  </head>
+  <body>
+    <!-- Game Canvas -->
+    <canvas class="canvas"></canvas>
 
-  <!-- Main Menu -->
-  <div class="main-menu">
-    <img src="./assets/images/wilders-logo.svg" class="main-menu__logo animate__animated animate__backInDown" />
-    <div class="main-menu__controls animate__animated animate__backInUp">
-      <input type="text" placeholder="Enter your name" class="main-menu__controls__input" />
-      <select class="main-menu__controls__server-select">
-        <option value="europe">Europe</option>
-        <option value="america">America</option>
-        <option value="asia">Asia</option>
-        <option value="oceania">Oceania</option>
-      </select>
-      <button class="main-menu__controls__play-button">Play</button>
-      <img src="./assets/images/cog.png" class="main-menu__loader" />
-      <div class="main-menu__notification">Cannot connect to this server</div>
+    <!-- Main Menu -->
+    <div class="main-menu">
+      <img
+        src="./assets/images/wilders-logo.svg"
+        class="main-menu__logo animate__animated animate__backInDown"
+      />
+      <div class="main-menu__controls animate__animated animate__backInUp">
+        <input
+          type="text"
+          placeholder="Enter your name"
+          class="main-menu__controls__input"
+        />
+        <select class="main-menu__controls__server-select">
+          <option value="europe">Europe</option>
+          <option value="america">America</option>
+          <option value="asia">Asia</option>
+          <option value="oceania">Oceania</option>
+        </select>
+        <button class="main-menu__controls__play-button">Play</button>
+        <img src="./assets/images/cog.png" class="main-menu__loader" />
+        <div class="main-menu__notification">Cannot connect to this server</div>
+      </div>
     </div>
-  </div>
-</body>
+  </body>
 </html>

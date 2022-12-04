@@ -1,15 +1,15 @@
-import { MapEntities } from "./config";
-import { MapEntity } from "./Types";
-import { EntityFactory, Sprite } from "./EntityFactory";
-import { Player } from "./Player";
+import { MapEntities } from "../config";
+import { IMapEntity } from "../types/map.types";
+import { EntityFactory, Sprite } from "../factories";
+import { Player } from "../Player";
 
 export class GameMap {
   public static readonly width = 1000;
   public static readonly height = 1000;
 
-  private entities: Array<MapEntity> = [];
-  private surroundingEntities: Array<MapEntity> = [];
-  private previousSurroundingEntities: Array<MapEntity> = [];
+  private entities: Array<IMapEntity> = [];
+  private surroundingEntities: Array<IMapEntity> = [];
+  private previousSurroundingEntities: Array<IMapEntity> = [];
   private renderedSprites: Array<Sprite> = [];
 
   constructor() {
@@ -32,8 +32,8 @@ export class GameMap {
   private getSurroundingEntities(player: Player) {
     return this.entities.filter(
       (entity) =>
-        Math.abs(player.x - entity.x) <= player.sightRadiusX &&
-        Math.abs(player.y - entity.y) <= player.sightRadiusY
+        Math.abs(player.x - entity.x) <= player.sightX &&
+        Math.abs(player.y - entity.y) <= player.sightY
     );
   }
 

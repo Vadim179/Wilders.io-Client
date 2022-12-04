@@ -1,7 +1,15 @@
 import { Socket } from "socket.io-client";
-import { PhaserGameConfig, Assets, MapEntities } from "./config";
-import { GameMap } from "./Map";
+import { PhaserGameConfig, Assets } from "./config";
+import { Crafting, GameMap, Inventory } from "./systems";
 import { Player } from "./Player";
+import { InventoryGUI, StatsGUI } from "./guis";
+import { EntityFactory } from "./factories";
+
+declare global {
+  interface Window {
+    crafting: Crafting;
+  }
+}
 
 export async function initializeGame(
   socket: Socket,
@@ -11,6 +19,7 @@ export async function initializeGame(
 ) {
   let player: Player;
   let map: GameMap;
+  let statsGUI: StatsGUI;
 
   new Phaser.Game({
     ...PhaserGameConfig,
@@ -28,11 +37,18 @@ export async function initializeGame(
     player = new Player({ scene: this, username, x: spawnX, y: spawnY });
     this.cameras.main.startFollow(player, false);
 
-    // reorder scene sprites by depth
-    console.log(player, this.children.list, this.children);
-
     // Create the map
     map = new GameMap().update(player);
+
+    // Initialize player stats
+    statsGUI = new StatsGUI(this);
+
+    // Initialize inventory
+    const inventory = new Inventory(8);
+    new InventoryGUI(this, inventory);
+
+    // Intialize crafting
+    window.crafting = new Crafting(inventory);
 
     // Movement
     const keyboardInput = {
@@ -77,15 +93,6 @@ export async function initializeGame(
       socket.emit("move", movement);
     });
 
-    // Attack
-    // window.addEventListener("mousedown", () => {
-    //   socket.emit("attack", true);
-    // });
-
-    // window.addEventListener("mouseup", () => {
-    //   socket.emit("attack", false);
-    // });
-
     // Rotation
     let rotation = 0;
 
@@ -96,9 +103,16 @@ export async function initializeGame(
     });
 
     // Socket listeners
-    socket.on("update", ([{ x, y }]) => {
+    socket.on("update", ({ x, y }) => {
       player.x = x;
       player.y = y;
+    });
+
+    socket.on("stats", ({ health, temperature, hunger }) => {
+      statsGUI
+        .updateStat("HEALTH", health)
+        .updateStat("TEMPERATURE", temperature)
+        .updateStat("HUNGER", hunger);
     });
   }
 
@@ -106,6 +120,7 @@ export async function initializeGame(
     if (player) {
       player.update();
       map.update(player);
+      statsGUI.update();
     }
   }
 }

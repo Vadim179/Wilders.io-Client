@@ -1,5 +1,5 @@
-import { EntitiesRenderingOrder } from "./config";
-import { Sprite, ISpriteConstructorParams } from "./EntityFactory";
+import { SpriteRenderingOrder } from "./config";
+import { Sprite, ISpriteConstructorParams } from "./factories";
 
 interface IPlayerConstructorParams
   extends Omit<ISpriteConstructorParams, "texture"> {
@@ -7,8 +7,8 @@ interface IPlayerConstructorParams
 }
 
 export class Player extends Phaser.GameObjects.Container {
-  sightRadiusX = 1440;
-  sightRadiusY = 900;
+  sightX = 1440;
+  sightY = 900;
 
   usernameTextOffset = { x: 0, y: -80 };
   armSpriteOffset = { x: 50, y: -30 };
@@ -24,8 +24,8 @@ export class Player extends Phaser.GameObjects.Container {
     this.render();
     this.renderUsername(username);
 
-    this.setDepth(EntitiesRenderingOrder.indexOf("Wilder"));
-    this.usernameText.setDepth(EntitiesRenderingOrder.indexOf("WilderUsername"));
+    this.setDepth(SpriteRenderingOrder.indexOf("WILDER"));
+    this.usernameText.setDepth(SpriteRenderingOrder.indexOf("WILDER_USERNAME"));
 
     this.scene.add.existing(this);
     this.start();
@@ -36,21 +36,21 @@ export class Player extends Phaser.GameObjects.Container {
 
     this.rightArmSprite = new Sprite({
       scene,
-      texture: "WilderLeftArm",
+      texture: "WILDER_LEFT_ARM",
       x: -armSpriteOffset.x,
       y: armSpriteOffset.y
     });
 
     this.leftArmSprite = new Sprite({
       scene,
-      texture: "WilderRightArm",
+      texture: "WILDER_RIGHT_ARM",
       x: armSpriteOffset.x,
       y: armSpriteOffset.y
     });
 
     this.bodySprite = new Sprite({
       scene,
-      texture: "Wilder",
+      texture: "WILDER",
       x: 0,
       y: 0
     });
