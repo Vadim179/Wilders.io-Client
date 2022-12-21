@@ -24,8 +24,8 @@ export const SpriteRenderingOrder = Object.freeze([
   "LARGE_IRON_ORE",
   "LARGE_GOLD_ORE",
 
-  "WILDER_LEFT_ARM",
-  "WILDER_RIGHT_ARM",
+  "WILDER_ARM_ITEM",
+  "WILDER_ARM",
   "WILDER",
   "WILDER_USERNAME",
 

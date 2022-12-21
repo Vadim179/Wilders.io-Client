@@ -108,6 +108,14 @@ export class StatsGUI extends Phaser.GameObjects.Container {
     return this;
   }
 
+  public updateStats(stats: { [key in StatType]: number }) {
+    Object.entries(stats).forEach(([statType, value]) => {
+      this.updateStat(statType.toUpperCase() as StatType, value);
+    });
+
+    return this;
+  }
+
   update() {
     this.statGUIs.forEach((statGUI) => statGUI.update());
   }

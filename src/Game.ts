@@ -35,6 +35,8 @@ export async function initializeGame(
   function create() {
     // Create the player
     player = new Player({ scene: this, username, x: spawnX, y: spawnY });
+    player.equip("COPPER_SWORD");
+    player.equip("COPPER_HELMET");
     this.cameras.main.startFollow(player, false);
 
     // Create the map
@@ -102,25 +104,35 @@ export async function initializeGame(
       socket.emit("rotate", rotation);
     });
 
+    // Attack
+    let canAttack = true;
+
+    window.addEventListener("mousedown", () => {
+      if (!canAttack) return;
+      canAttack = false;
+
+      setTimeout(() => {
+        canAttack = true;
+      }, 500);
+
+      socket.emit("attack");
+      player.playAttackAnimation();
+    });
+
     // Socket listeners
     socket.on("update", ({ x, y }) => {
       player.x = x;
       player.y = y;
     });
 
-    socket.on("stats", ({ health, temperature, hunger }) => {
-      statsGUI
-        .updateStat("HEALTH", health)
-        .updateStat("TEMPERATURE", temperature)
-        .updateStat("HUNGER", hunger);
+    socket.on("tick", ({ stats }) => {
+      statsGUI.updateStats(stats);
     });
   }
 
   function update() {
-    if (player) {
-      player.update();
-      map.update(player);
-      statsGUI.update();
-    }
+    player.update();
+    map.update(player);
+    statsGUI.update();
   }
 }

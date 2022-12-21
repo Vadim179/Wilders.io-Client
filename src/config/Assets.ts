@@ -80,10 +80,12 @@ export const Assets = Object.freeze([
   { name: "Stone Sword", id: "STONE_SWORD", asset: "stone-sword.png" },
   { name: "Copper Pickaxe", id: "COPPER_PICKAXE", asset: "copper-pickaxe.png" },
   { name: "Copper Sword", id: "COPPER_SWORD", asset: "copper-sword.png" },
+  { name: "Copper Helmet", id: "COPPER_HELMET", asset: "copper-helmet.png" },
   { name: "Iron Pickaxe", id: "IRON_PICKAXE", asset: "iron-pickaxe.png" },
   { name: "Iron Sword", id: "IRON_SWORD", asset: "iron-sword.png" },
   { name: "Gold Pickaxe", id: "GOLD_PICKAXE", asset: "gold-pickaxe.png" },
   { name: "Gold Sword", id: "GOLD_SWORD", asset: "gold-sword.png" },
+  { name: "Gold Helmet", id: "GOLD_HELMET", asset: "gold-helmet.png" },
 
   { name: "Wilder", id: "WILDER", asset: "wilder.png" },
   { name: "Wood", id: "WOOD", asset: "wood.png" },
