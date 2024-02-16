@@ -1,5 +1,5 @@
 import { CraftingRecipes } from "../config";
-import { Inventory } from "./inventory.system";
+import { Inventory } from "./Inventory";
 import { IInventoryItemStack, InventoryItem } from "../types";
 
 export class Crafting {

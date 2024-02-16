@@ -1,6 +1,6 @@
-import { SpriteRenderingOrder } from "./config";
-import { EntityFactory, ISpriteConstructorParams } from "./factories";
-import { IPosition } from "./types";
+import { SpriteRenderingOrder } from "../config";
+import { EntityFactory, ISpriteConstructorParams } from "../factories";
+import { IPosition } from "../types";
 
 interface IPlayerConstructorParams
   extends Omit<ISpriteConstructorParams, "texture"> {
@@ -59,9 +59,9 @@ export class Player extends Phaser.GameObjects.Container {
       y: armSpriteOffset.y
     });
 
-    this.bodySprite = EntityFactory.createEntity({
+    this.bodySprite = EntityFactory.createSprite({
       scene,
-      type: "WILDER",
+      texture: "WILDER",
       x: 0,
       y: 0
     });
@@ -127,7 +127,7 @@ export class Player extends Phaser.GameObjects.Container {
       this.leftArmTargetOffset = { x: 0, y: -70 };
       this.leftArmTargetRotation = -45 * (Math.PI / 180);
       this.rightArmTargetOffset = { x: -60, y: -10 };
-  
+
       setTimeout(() => {
         this.leftArmTargetOffset = { x: 50, y: -30 };
         this.leftArmTargetRotation = 0;
@@ -137,24 +137,23 @@ export class Player extends Phaser.GameObjects.Container {
       this.rightArmTargetOffset = { x: 0, y: -70 };
       this.rightArmTargetRotation = 45 * (Math.PI / 180);
       this.leftArmTargetOffset = { x: 60, y: -10 };
-  
+
       setTimeout(() => {
         this.rightArmTargetOffset = { x: -50, y: -30 };
         this.rightArmTargetRotation = 0;
         this.leftArmTargetOffset = { x: 50, y: -30 };
       }, 200);
     }
-  
+
     this.attackWithLeft = false; // Toggle the attackWithLeft flag
   }
-  
 
   // TODO: Refactor this method
-  public equip(type:string, item: string) {
-    if (type === 'head') {
-      this.equipedItem = EntityFactory.createEntity({
+  public equip(type: string, item: string) {
+    if (type === "head") {
+      this.equipedItem = EntityFactory.createSprite({
         scene: this.scene,
-        type: item,
+        texture: item,
         x: 0,
         y: -5
       });
@@ -162,13 +161,12 @@ export class Player extends Phaser.GameObjects.Container {
       this.add(this.equipedItem);
       return;
     }
-    if(type === 'left_arm'){
+    if (type === "left_arm") {
       this.rightArmSprite.equip(item);
     }
-    if(type === 'right_arm'){
+    if (type === "right_arm") {
       this.leftArmSprite.equip(item);
     }
-
   }
 
   public update() {
@@ -220,9 +218,9 @@ class PlayerArm extends Phaser.GameObjects.Container {
   }
 
   private start() {
-    this.arm = EntityFactory.createEntity({
+    this.arm = EntityFactory.createSprite({
       scene: this.scene,
-      type: this.armTexture,
+      texture: this.armTexture,
       x: 0,
       y: 0
     });
@@ -237,9 +235,9 @@ class PlayerArm extends Phaser.GameObjects.Container {
       this.equipedItem = null;
     }
 
-    this.equipedItem = EntityFactory.createEntity({
+    this.equipedItem = EntityFactory.createSprite({
       scene: this.scene,
-      type: item,
+      texture: item,
       x: 0,
       y: -30
     });
