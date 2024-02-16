@@ -1,5 +1,5 @@
 export enum StatTypeEnum {
   HEALTH = "HEALTH",
-  HUNGER = "HUNGER",
-  TEMPERATURE = "TEMPERATURE"
+  // HUNGER = "HUNGER",
+  // TEMPERATURE = "TEMPERATURE"
 }

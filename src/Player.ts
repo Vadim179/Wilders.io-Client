@@ -127,30 +127,31 @@ export class Player extends Phaser.GameObjects.Container {
       this.leftArmTargetOffset = { x: 0, y: -70 };
       this.leftArmTargetRotation = -45 * (Math.PI / 180);
       this.rightArmTargetOffset = { x: -60, y: -10 };
-
+  
       setTimeout(() => {
         this.leftArmTargetOffset = { x: 50, y: -30 };
         this.leftArmTargetRotation = 0;
         this.rightArmTargetOffset = { x: -50, y: -30 };
-      }, 300);
+      }, 200);
     } else {
       this.rightArmTargetOffset = { x: 0, y: -70 };
       this.rightArmTargetRotation = 45 * (Math.PI / 180);
       this.leftArmTargetOffset = { x: 60, y: -10 };
-
+  
       setTimeout(() => {
         this.rightArmTargetOffset = { x: -50, y: -30 };
         this.rightArmTargetRotation = 0;
         this.leftArmTargetOffset = { x: 50, y: -30 };
-      }, 300);
+      }, 200);
     }
-
-    // this.attackWithLeft = !this.attackWithLeft;
+  
+    this.attackWithLeft = false; // Toggle the attackWithLeft flag
   }
+  
 
   // TODO: Refactor this method
-  public equip(item: string) {
-    if (item.includes("_HELMET")) {
+  public equip(type:string, item: string) {
+    if (type === 'head') {
       this.equipedItem = EntityFactory.createEntity({
         scene: this.scene,
         type: item,
@@ -161,8 +162,13 @@ export class Player extends Phaser.GameObjects.Container {
       this.add(this.equipedItem);
       return;
     }
+    if(type === 'left_arm'){
+      this.rightArmSprite.equip(item);
+    }
+    if(type === 'right_arm'){
+      this.leftArmSprite.equip(item);
+    }
 
-    this.rightArmSprite.equip(item);
   }
 
   public update() {
