@@ -1,7 +1,7 @@
 import { MapEntities } from "../config";
 import { IMapEntity } from "../types/map.types";
 import { EntityFactory, Sprite } from "../factories";
-import { Player } from "../Player";
+import { Player } from "./Player";
 
 export class GameMap {
   public static readonly width = 1000;
@@ -41,11 +41,11 @@ export class GameMap {
    * Renders the given array of entities to the given scene
    */
   private render(scene: Phaser.Scene) {
-    this.surroundingEntities.forEach(({ id, type, x, y }) => {
+    this.surroundingEntities.forEach(({ id, type: texture, x, y }) => {
       if (this.renderedSprites.some((sprite) => sprite.id === id)) return;
 
       this.renderedSprites.push(
-        EntityFactory.createEntity({ id, type, scene, x, y })
+        EntityFactory.createSprite({ id, texture, scene, x, y, zIndex: texture })
       );
     });
   }

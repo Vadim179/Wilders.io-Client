@@ -1,3 +1,3 @@
-export * from "./inventory-item-types.enum";
-export * from "./inventory-item.enum";
-export * from "./stat-type.enum";
+export * from "./InventoryItemTypeEnum";
+export * from "./InventoryItemEnum";
+export * from "./StatTypeEnum";

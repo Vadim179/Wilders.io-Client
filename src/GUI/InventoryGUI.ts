@@ -1,6 +1,6 @@
 import { SpriteRenderingOrder } from "../config";
 import { EntityFactory, Sprite } from "../factories";
-import { Inventory, InventorySlot } from "../systems";
+import { Inventory, InventorySlot } from "../components";
 
 class InventorySlotGUI extends Phaser.GameObjects.Container {
   slotSprite: Sprite;
@@ -23,21 +23,23 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
   private create() {
     const { scene, slot, itemQuantityTextOffset } = this;
 
-    this.slotSprite = EntityFactory.createEntity({
+    this.slotSprite = EntityFactory.createSprite({
       scene,
       x: 0,
       y: 0,
-      type: "SLOT"
+      texture: "SLOT",
+      zIndex: "SLOT"
     });
 
     this.add(this.slotSprite);
 
     if (slot.item) {
-      this.itemSprite = EntityFactory.createEntity({
+      this.itemSprite = EntityFactory.createSprite({
         scene,
         x: 0,
         y: 0,
-        type: slot.item
+        texture: slot.item,
+        zIndex: slot.item
       });
 
       const itemQuantityTextStyle = {
@@ -84,11 +86,11 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   create() {
     this.inventory.slots.forEach((slot, index) => {
       const slotGUI = new InventorySlotGUI(this.scene, 0, 0, slot);
-      const slotSprite = slotGUI.slotSprite;
 
       slotGUI.setPosition(
-        index * (slotSprite.width + this.slotGap) + slotSprite.width / 2,
-        -slotSprite.height / 2
+        index * (slotGUI.slotSprite.width + this.slotGap) +
+          slotGUI.slotSprite.width / 2,
+        -slotGUI.slotSprite.height / 2
       );
 
       this.add(slotGUI);

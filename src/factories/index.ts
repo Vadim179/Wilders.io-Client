@@ -1,1 +1,1 @@
-export * from "./entity.factory";
+export * from "./EntityFactory";
