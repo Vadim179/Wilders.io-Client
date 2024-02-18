@@ -145,7 +145,7 @@ export class Player extends Phaser.GameObjects.Container {
       }, 200);
     }
 
-    this.attackWithLeft = false; // Toggle the attackWithLeft flag
+    this.attackWithLeft = !this.attackWithLeft; // Toggle the attackWithLeft flag
   }
 
   // TODO: Refactor this method

@@ -145,8 +145,6 @@ export async function initializeGame(
       isMouseDown = false;
     });
 
-    setInterval(attack, 100);
-
     // Socket listeners
     socket.on("update", ({ x, y }) => {
       player.x = x;
