@@ -41,7 +41,7 @@ export class GameMap {
    * Renders the given array of entities to the given scene
    */
   private render(scene: Phaser.Scene) {
-    this.surroundingEntities.forEach(({ id, type: texture, x, y }) => {
+    this.surroundingEntities.forEach(({ id, texture, x, y }) => {
       if (this.renderedSprites.some((sprite) => sprite.id === id)) return;
 
       this.renderedSprites.push(
