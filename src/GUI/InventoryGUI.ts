@@ -1,6 +1,8 @@
-import { SpriteRenderingOrder } from "../config";
+import { SpriteRenderingOrder, inventoryItemToOptions } from "../config";
 import { EntityFactory, Sprite } from "../factories";
-import { Inventory, InventorySlot } from "../components";
+import { Item } from "../enums/itemEnum";
+
+type Slot = [Item | null, number];
 
 class InventorySlotGUI extends Phaser.GameObjects.Container {
   slotSprite: Sprite;
@@ -9,12 +11,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
   itemQuantityText: Phaser.GameObjects.Text;
   itemQuantityTextOffset = { x: 0, y: -60 };
 
-  constructor(
-    scene: Phaser.Scene,
-    x: number,
-    y: number,
-    private slot: InventorySlot
-  ) {
+  constructor(scene: Phaser.Scene, x: number, y: number, private slot: Slot) {
     super(scene, x, y, []);
     scene.add.existing(this);
     this.create();
@@ -33,13 +30,17 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
 
     this.add(this.slotSprite);
 
-    if (slot.item) {
+    const [item, amount] = slot;
+
+    if (item !== null) {
+      const options = inventoryItemToOptions[item];
+
       this.itemSprite = EntityFactory.createSprite({
         scene,
         x: 0,
         y: 0,
-        texture: slot.item,
-        zIndex: slot.item
+        texture: options.texture,
+        zIndex: options.texture
       });
 
       const itemQuantityTextStyle = {
@@ -53,7 +54,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
         scene,
         itemQuantityTextOffset.x,
         itemQuantityTextOffset.y,
-        `x${slot.quantity.toString()}`,
+        `${amount.toString()}`,
         itemQuantityTextStyle
       ).setOrigin(0.5);
 
@@ -65,11 +66,11 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
 export class InventoryGUI extends Phaser.GameObjects.Container {
   slotGap = 10;
   bottomMargin = 10;
+  slots: Slot[];
 
-  constructor(scene: Phaser.Scene, private inventory: Inventory) {
+  constructor(scene: Phaser.Scene) {
     super(scene, 0, 0);
-    inventory.on("update", () => this.update());
-
+    this.slots = new Array(8).fill([null, 0]);
     scene.add.existing(this);
     this.create();
   }
@@ -84,7 +85,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   }
 
   create() {
-    this.inventory.slots.forEach((slot, index) => {
+    this.slots.forEach((slot, index) => {
       const slotGUI = new InventorySlotGUI(this.scene, 0, 0, slot);
 
       slotGUI.setPosition(
@@ -103,8 +104,9 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     this.setGUIPosition();
   }
 
-  update() {
-    // this.removeAll(true);
-    // this.create();
+  update(slots: Slot[]) {
+    this.slots = slots;
+    this.removeAll(true);
+    this.create();
   }
 }

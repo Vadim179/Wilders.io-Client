@@ -1,5 +1,5 @@
 import { Socket } from "socket.io-client";
-import { PhaserGameConfig, Assets } from "./config";
+import { PhaserGameConfig, assets } from "./config";
 import { Crafting, GameMap, Inventory, Player } from "./components";
 import { InventoryGUI, StatsGUI } from "./GUI";
 
@@ -25,8 +25,8 @@ export async function initializeGame(
   });
 
   function preload() {
-    Assets.forEach(({ id, asset }) => {
-      this.load.image(id, `/assets/images/${asset}`);
+    Object.entries(assets).forEach(([name, asset]) => {
+      this.load.image(name, `/assets/images/${asset}`);
     });
   }
 
@@ -42,11 +42,10 @@ export async function initializeGame(
     statsGUI = new StatsGUI(this);
 
     // Initialize inventory
-    const inventory = new Inventory(8);
-    new InventoryGUI(this, inventory);
+    const inventoryGUI = new InventoryGUI(this);
 
     // Intialize crafting
-    window.crafting = new Crafting(inventory);
+    // window.crafting = new Crafting(inventory);
 
     // Movement
     const keyboardInput = {
@@ -143,6 +142,10 @@ export async function initializeGame(
 
     window.addEventListener("mouseup", () => {
       isMouseDown = false;
+    });
+
+    socket.on("inventory_update", (items) => {
+      inventoryGUI.update(items);
     });
 
     // Socket listeners

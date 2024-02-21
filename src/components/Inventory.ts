@@ -1,5 +1,4 @@
 import EventEmitter = require("events");
-import { StarterInventoryItems } from "../config";
 import { InventoryItem } from "../types";
 
 export class InventorySlot {
@@ -48,13 +47,6 @@ export class Inventory extends EventEmitter {
 
     this.slotsCount = slotsCount;
     this.slots = new Array(slotsCount).fill(null).map(() => new InventorySlot());
-    this.initialize();
-  }
-
-  private initialize() {
-    Object.entries(StarterInventoryItems).forEach(([item, quantity]) => {
-      this.addItem(item as InventoryItem, quantity);
-    });
   }
 
   public isFull() {

@@ -42,5 +42,6 @@ export const SpriteRenderingOrder = Object.freeze([
   "LARGE_OAK_TREE",
 
   "INVENTORY",
-  "STATS"
+  "STATS",
+  "WOOD"
 ]);
