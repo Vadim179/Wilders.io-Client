@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { initializeGame } from "./Game";
+import { initializeGame } from "./game.s";
 
 const menu = <HTMLElement>document.querySelector(".main-menu");
 const usernameInput = <HTMLElement>(
@@ -62,7 +62,7 @@ export function initializeMainMenu() {
 
   playButton.addEventListener("click", () => {
     clearNotification();
-    setMenuLoading();
+    setMenuLoading(true);
 
     if (socket) {
       socket.disconnect();
@@ -81,7 +81,7 @@ export function initializeMainMenu() {
       query: { username }
     });
 
-    socket.io.once("reconnect_failed", () => {
+    socket.io.on("reconnect_failed", () => {
       setMenuLoading(false);
       showNotification("Couldn't connect to this server");
       playButton.removeAttribute("disabled");

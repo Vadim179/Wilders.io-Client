@@ -1,9 +1,8 @@
-import { SpriteRenderingOrder } from "../config";
-import { EntityFactory, ISpriteConstructorParams } from "../factories";
-import { IPosition } from "../types";
+import { SpriteRenderingOrder } from "../config/rendering.config";
+import { EntityFactory, SpriteConstructorParams } from "../factories";
+import { Position } from "../types/mapTypes";
 
-interface IPlayerConstructorParams
-  extends Omit<ISpriteConstructorParams, "texture"> {
+interface PlayerConstructorParams extends Omit<SpriteConstructorParams, "texture"> {
   username: string;
 }
 
@@ -19,17 +18,17 @@ export class Player extends Phaser.GameObjects.Container {
   usernameText: Phaser.GameObjects.Text;
   bodySprite: Phaser.GameObjects.Sprite;
 
-  leftArmTargetOffset: IPosition;
+  leftArmTargetOffset: Position;
   leftArmTargetRotation = 0;
   leftArmSprite: PlayerArm;
   leftArmTween: Phaser.Tweens.Tween;
 
-  rightArmTargetOffset: IPosition;
+  rightArmTargetOffset: Position;
   rightArmTargetRotation = 0;
   rightArmSprite: PlayerArm;
   rightArmTween: Phaser.Tweens.Tween;
 
-  constructor({ scene, x, y, username }: IPlayerConstructorParams) {
+  constructor({ scene, x, y, username }: PlayerConstructorParams) {
     super(scene, x, y, []);
 
     this.render();
@@ -208,7 +207,7 @@ class PlayerArm extends Phaser.GameObjects.Container {
 
   equipedItem: Phaser.GameObjects.Sprite;
 
-  constructor({ scene, x, y, texture }: ISpriteConstructorParams) {
+  constructor({ scene, x, y, texture }: SpriteConstructorParams) {
     super(scene, x, y, []);
     this.armTexture = texture;
 

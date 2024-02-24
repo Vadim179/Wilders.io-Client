@@ -1,4 +1,7 @@
 export enum Item {
   Wood,
-  Stone
+  Stone,
+  WoodPickaxe,
+  WoodSword,
+  WoodHelmet
 }

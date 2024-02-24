@@ -1,6 +1,7 @@
 import { Texture } from "../enums/textureEnum";
 
-export const MapEntities = Object.freeze([
+// TODO: Refactor
+export const mapEntities = Object.freeze([
   // Decorations
   { texture: Texture.LargeHill, x: 400, y: 100, id: NaN },
   { texture: Texture.Pebble, x: 200, y: 200, id: NaN },

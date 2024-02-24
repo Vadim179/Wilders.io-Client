@@ -1,6 +1,7 @@
-import { SpriteRenderingOrder, inventoryItemToOptions } from "../config";
 import { EntityFactory, Sprite } from "../factories";
 import { Item } from "../enums/itemEnum";
+import { inventoryItemOptionsMap } from "../config/inventoryConfig";
+import { SpriteRenderingOrder } from "../config/rendering.config";
 
 type Slot = [Item | null, number];
 
@@ -33,7 +34,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
     const [item, amount] = slot;
 
     if (item !== null) {
-      const options = inventoryItemToOptions[item];
+      const options = inventoryItemOptionsMap[item];
 
       this.itemSprite = EntityFactory.createSprite({
         scene,

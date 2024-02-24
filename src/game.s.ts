@@ -1,13 +1,11 @@
 import { Socket } from "socket.io-client";
-import { PhaserGameConfig, assets } from "./config";
-import { Crafting, GameMap, Inventory, Player } from "./components";
 import { InventoryGUI, StatsGUI } from "./GUI";
 
-declare global {
-  interface Window {
-    crafting: Crafting;
-  }
-}
+import { phaserGameConfig } from "./config/phaserConfig";
+import { assets } from "./config/assets";
+
+import { Player } from "./components/Player";
+import { GameMap } from "./components/Map";
 
 export async function initializeGame(
   socket: Socket,
@@ -20,7 +18,7 @@ export async function initializeGame(
   let statsGUI: StatsGUI;
 
   new Phaser.Game({
-    ...PhaserGameConfig,
+    ...phaserGameConfig,
     scene: { preload, create, update }
   });
 
@@ -38,14 +36,8 @@ export async function initializeGame(
     // Create the map
     map = new GameMap().update(player);
 
-    // Initialize player stats
     statsGUI = new StatsGUI(this);
-
-    // Initialize inventory
     const inventoryGUI = new InventoryGUI(this);
-
-    // Intialize crafting
-    // window.crafting = new Crafting(inventory);
 
     // Movement
     const keyboardInput = {
@@ -144,14 +136,14 @@ export async function initializeGame(
       isMouseDown = false;
     });
 
-    socket.on("inventory_update", (items) => {
-      inventoryGUI.update(items);
-    });
-
     // Socket listeners
     socket.on("update", ({ x, y }) => {
       player.x = x;
       player.y = y;
+    });
+
+    socket.on("inventory_update", (items) => {
+      inventoryGUI.update(items);
     });
 
     socket.on("tick", ({ stats }) => {

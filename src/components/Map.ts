@@ -1,16 +1,16 @@
-import { MapEntities } from "../config";
 import { IMapEntity } from "../types/map.types";
 import { EntityFactory, Sprite } from "../factories";
 import { Player } from "./Player";
+import { mapEntities } from "../config/map";
 
 export class GameMap {
   public static readonly width = 1000;
   public static readonly height = 1000;
 
-  private entities: Array<IMapEntity> = [];
-  private surroundingEntities: Array<IMapEntity> = [];
-  private previousSurroundingEntities: Array<IMapEntity> = [];
-  private renderedSprites: Array<Sprite> = [];
+  private entities: IMapEntity[] = [];
+  private surroundingEntities: IMapEntity[] = [];
+  private previousSurroundingEntities: IMapEntity[] = [];
+  private renderedSprites: Sprite[] = [];
 
   constructor() {
     this.entities = this.loadEntities();
@@ -20,7 +20,7 @@ export class GameMap {
    * Loads the map entities into memory and applies id's to them
    */
   private loadEntities() {
-    return MapEntities.map((entity, index) => ({
+    return mapEntities.map((entity, index) => ({
       ...entity,
       id: String(index)
     }));

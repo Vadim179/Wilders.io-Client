@@ -1,7 +1,13 @@
 import { EntityFactory } from "../factories";
-import { SpriteRenderingOrder, StatColors } from "../config";
 import { StatTypeEnum } from "../enums";
 import { StatType } from "../types";
+import { SpriteRenderingOrder } from "../config/rendering.config";
+
+const statColors = {
+  [StatTypeEnum.HEALTH]: 0xee3e75
+  // [StatTypeEnum.HUNGER]: 0xba5c41,
+  // [StatTypeEnum.TEMPERATURE]: 0xa5c7df
+};
 
 class StatGUI extends Phaser.GameObjects.Container {
   value = 100;
@@ -61,7 +67,7 @@ class StatGUI extends Phaser.GameObjects.Container {
       barBackgroundSprite.displayHeight / 2,
       this.barRectangleFullWidth,
       barBackgroundSprite.displayHeight - 5,
-      StatColors[statType]
+      statColors[statType]
     ).setOrigin(0);
 
     this.add([
@@ -91,7 +97,7 @@ export class StatsGUI extends Phaser.GameObjects.Container {
     this.create();
   }
 
-  statGUIs: Array<StatGUI> = [];
+  statGUIs: StatGUI[] = [];
   private create() {
     const statTypes = Object.values(StatTypeEnum);
 

@@ -1,17 +1,7 @@
 import * as uuid from "uuid";
-import { SpriteRenderingOrder } from "../config";
+import { SpriteRenderingOrder } from "../config/rendering.config";
 
-/*
-..######..########..########..####.########.########
-.##....##.##.....##.##.....##..##.....##....##......
-.##.......##.....##.##.....##..##.....##....##......
-..######..########..########...##.....##....######..
-.......##.##........##...##....##.....##....##......
-.##....##.##........##....##...##.....##....##......
-..######..##........##.....##.####....##....########
-*/
-
-export interface ISpriteConstructorParams {
+export interface SpriteConstructorParams {
   id?: string;
   scene: Phaser.Scene;
   x: number;
@@ -23,7 +13,7 @@ export interface ISpriteConstructorParams {
 class BaseSprite extends Phaser.GameObjects.Sprite {
   id: string;
 
-  constructor({ id, scene, x, y, texture, zIndex }: ISpriteConstructorParams) {
+  constructor({ id, scene, x, y, texture, zIndex }: SpriteConstructorParams) {
     super(scene, x, y, texture);
     this.id = id || uuid.v4();
 
@@ -40,23 +30,13 @@ class BaseSprite extends Phaser.GameObjects.Sprite {
   create() {}
 }
 
-/*
-..######...#######..##....##.########....###....####.##....##.########.########.
-.##....##.##.....##.###...##....##......##.##....##..###...##.##.......##.....##
-.##.......##.....##.####..##....##.....##...##...##..####..##.##.......##.....##
-.##.......##.....##.##.##.##....##....##.....##..##..##.##.##.######...########.
-.##.......##.....##.##..####....##....#########..##..##..####.##.......##...##..
-.##....##.##.....##.##...###....##....##.....##..##..##...###.##.......##....##.
-..######...#######..##....##....##....##.....##.####.##....##.########.##.....##
-*/
-
-export interface IContainerConstructorParams
+export interface ContainerConstructorParams
   extends Omit<ISpriteConstructorParams, "texture"> {}
 
 class BaseContainer extends Phaser.GameObjects.Container {
   id: string;
 
-  constructor({ id, scene, x, y, zIndex }: IContainerConstructorParams) {
+  constructor({ id, scene, x, y, zIndex }: ContainerConstructorParams) {
     super(scene, x, y);
     this.id = id || uuid.v4();
 
@@ -73,39 +53,13 @@ class BaseContainer extends Phaser.GameObjects.Container {
   update() {}
 }
 
-/*
-.########.##....##.########.####.########.####.########..######.
-.##.......###...##....##.....##.....##.....##..##.......##....##
-.##.......####..##....##.....##.....##.....##..##.......##......
-.######...##.##.##....##.....##.....##.....##..######....######.
-.##.......##..####....##.....##.....##.....##..##.............##
-.##.......##...###....##.....##.....##.....##..##.......##....##
-.########.##....##....##....####....##....####.########..######.
-*/
-
 export class Sprite extends BaseSprite {}
 
-export class SpriteContainer extends BaseSprite {}
-
 export class Container extends BaseContainer {}
-
-/*
-.########....###.....######..########..#######..########..##....##
-.##.........##.##...##....##....##....##.....##.##.....##..##..##.
-.##........##...##..##..........##....##.....##.##.....##...####..
-.######...##.....##.##..........##....##.....##.########.....##...
-.##.......#########.##..........##....##.....##.##...##......##...
-.##.......##.....##.##....##....##....##.....##.##....##.....##...
-.##.......##.....##..######.....##.....#######..##.....##....##...
-*/
 
 export class EntityFactory {
   static createSprite(entityParams: ISpriteConstructorParams) {
     return new Sprite(entityParams);
-  }
-
-  static createSpriteContainer(spriteContainerParams: ISpriteConstructorParams) {
-    return new SpriteContainer(spriteContainerParams);
   }
 
   static createContainer(contaianerParams: IContainerConstructorParams) {
