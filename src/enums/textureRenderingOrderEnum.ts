@@ -23,6 +23,7 @@ export enum TextureRenderingOrderEnum {
   WilderArm,
   Wilder,
   Username,
+  Shadow,
   AppleTree,
   Apple,
   SmallDarkOakTree,
