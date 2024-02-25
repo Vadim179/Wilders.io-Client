@@ -87,11 +87,9 @@ export function initializeMainMenu() {
       playButton.removeAttribute("disabled");
     });
 
-    socket.once("connect", () => {
-      socket.once("spawn", ({ x, y }) => {
-        hideMenu();
-        initializeGame(socket, username, x, y);
-      });
+    socket.once("init", ({ x, y }) => {
+      hideMenu();
+      initializeGame(socket, username, x, y);
     });
   });
 }

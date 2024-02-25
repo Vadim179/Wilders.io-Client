@@ -1,7 +1,7 @@
-import { SpriteRenderingOrder } from "../config/rendering.config";
 import { Sprite, SpriteConstructorParams } from "./Sprite";
 import { Position } from "../types/mapTypes";
 import { Texture } from "../enums/textureEnum";
+import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
 interface PlayerConstructorParams extends Omit<SpriteConstructorParams, "texture"> {
   username: string;
@@ -35,8 +35,8 @@ export class Player extends Phaser.GameObjects.Container {
     this.render();
     this.renderUsername(username);
 
-    this.setDepth(SpriteRenderingOrder.indexOf("WILDER"));
-    this.usernameText.setDepth(SpriteRenderingOrder.indexOf("WILDER_USERNAME"));
+    this.setDepth(TextureRenderingOrderEnum.Wilder);
+    this.usernameText.setDepth(TextureRenderingOrderEnum.Username);
 
     this.scene.add.existing(this);
     this.start();
@@ -122,7 +122,7 @@ export class Player extends Phaser.GameObjects.Container {
 
   // TODO: Refactor this method
   attackWithLeft = false;
-  public playAttackAnimation() {
+  playAttackAnimation() {
     if (this.attackWithLeft) {
       this.leftArmTargetOffset = { x: 0, y: -70 };
       this.leftArmTargetRotation = -45 * (Math.PI / 180);
@@ -148,7 +148,7 @@ export class Player extends Phaser.GameObjects.Container {
     this.attackWithLeft = !this.attackWithLeft; // Toggle the attackWithLeft flag
   }
 
-  public update() {
+  update() {
     const {
       x,
       y,
@@ -191,7 +191,7 @@ class PlayerArm extends Phaser.GameObjects.Container {
     super(scene, x, y, []);
     this.armTexture = texture;
 
-    this.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM"));
+    this.setDepth(TextureRenderingOrderEnum.WilderArm);
     this.scene.add.existing(this);
     this.start();
   }
@@ -201,28 +201,11 @@ class PlayerArm extends Phaser.GameObjects.Container {
       scene: this.scene,
       texture: this.armTexture,
       x: 0,
-      y: 0
+      y: 0,
+      order: TextureRenderingOrderEnum.WilderArm
     });
 
-    this.arm.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM"));
+    this.arm.setDepth(TextureRenderingOrderEnum.WilderArm);
     this.add(this.arm);
   }
-
-  // public equip(item: string) {
-  //   if (this.equipedItem) {
-  //     this.equipedItem.destroy();
-  //     this.equipedItem = null;
-  //   }
-
-  //   this.equipedItem = new Sprite({
-  //     scene: this.scene,
-  //     texture: item,
-  //     x: 0,
-  //     y: -30
-  //   });
-
-  //   this.equipedItem.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM_ITEM"));
-  //   this.add(this.equipedItem);
-  //   this.bringToTop(this.arm);
-  // }
 }

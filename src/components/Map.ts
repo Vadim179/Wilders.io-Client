@@ -5,8 +5,8 @@ import { mapEntities } from "../config/map";
 type Entity = (typeof mapEntities)[number];
 
 export class GameMap {
-  public static readonly width = 1000;
-  public static readonly height = 1000;
+  static readonly width = 1000;
+  static readonly height = 1000;
 
   private surroundingEntities: Entity[] = [];
   private previousSurroundingEntities: Entity[] = [];
@@ -27,16 +27,14 @@ export class GameMap {
    * Renders the given array of entities to the given scene
    */
   private render(scene: Phaser.Scene) {
-    this.surroundingEntities.forEach(({ id, texture, x, y }) => {
+    this.surroundingEntities.forEach(({ id, texture, x, y, order }) => {
       if (this.renderedSprites.some((sprite) => sprite.id === id)) return;
 
-      this.renderedSprites.push(
-        new Sprite({ id, texture, scene, x, y, zIndex: texture })
-      );
+      this.renderedSprites.push(new Sprite({ id, texture, scene, x, y, order }));
     });
   }
 
-  public update(player: Player) {
+  update(player: Player) {
     this.surroundingEntities = this.getSurroundingEntities(player);
 
     // Remove any entities that are no longer in the player's sight radius

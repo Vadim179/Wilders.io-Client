@@ -1,26 +1,29 @@
-import { SpriteRenderingOrder } from "../config/rendering.config";
 import { Texture } from "../enums/textureEnum";
+import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
 export interface SpriteConstructorParams {
   scene: Phaser.Scene;
-  id: number;
   x: number;
   y: number;
   texture: Texture;
-  zIndex: string;
+  id?: string;
+  order?: number;
 }
 
 export class Sprite extends Phaser.GameObjects.Sprite {
-  id: number;
+  id: string;
 
-  constructor({ id, scene, x, y, texture, zIndex }: SpriteConstructorParams) {
+  constructor({
+    scene,
+    x,
+    y,
+    texture,
+    id = "",
+    order = TextureRenderingOrderEnum.Default
+  }: SpriteConstructorParams) {
     super(scene, x, y, texture);
     this.id = id;
-
-    if (zIndex) {
-      this.setDepth(SpriteRenderingOrder.indexOf(zIndex));
-    }
-
+    this.setDepth(order);
     this.scene.add.existing(this);
   }
 }

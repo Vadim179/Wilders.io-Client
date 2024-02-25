@@ -1,17 +1,26 @@
 import { Sprite } from "../components/Sprite";
-import { SpriteRenderingOrder } from "../config/rendering.config";
 import { Texture } from "../enums/textureEnum";
+import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
-export enum StatType {
-  Health = "HEALTH"
-  // Hunger = "HUNGER",
-  // Temperature = "TEMPERATURE"
+enum Stat {
+  Health = "health",
+  Hunger = "hunger",
+  Temperature = "temperature"
 }
 
-const statColors = {
-  [StatType.Health]: 0xee3e75
-  // [StatType.Hunger]: 0xba5c41,
-  // [StatType.Temperature]: 0xa5c7df
+const statBarOptions = {
+  [Stat.Health]: {
+    color: 0xee3e75,
+    iconTexture: Texture.HealthIcon
+  },
+  [Stat.Hunger]: {
+    color: 0xba5c41,
+    iconTexture: Texture.HungerIcon
+  },
+  [Stat.Temperature]: {
+    color: 0xa5c7df,
+    iconTexture: Texture.TemperatureIcon
+  }
 };
 
 class StatGUI extends Phaser.GameObjects.Container {
@@ -20,21 +29,22 @@ class StatGUI extends Phaser.GameObjects.Container {
   barRectangle: Phaser.GameObjects.Rectangle;
   barRectangleFullWidth: number;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, public statType: StatType) {
+  constructor(scene: Phaser.Scene, x: number, y: number, public statType: Stat) {
     super(scene, x, y, []);
     scene.add.existing(this);
     this.create();
   }
 
-  private create() {
+  create() {
     const { scene, statType } = this;
+    const statOptions = statBarOptions[statType];
 
     const slotSprite = new Sprite({
       scene: this.scene,
       x: 0,
       y: 0,
       texture: Texture.Slot,
-      zIndex: "SLOT"
+      order: TextureRenderingOrderEnum.UI
     })
       .setScale(0.85)
       .setOrigin(0);
@@ -43,24 +53,24 @@ class StatGUI extends Phaser.GameObjects.Container {
       scene: this.scene,
       x: slotSprite.displayWidth / 2,
       y: slotSprite.displayHeight / 2,
-      texture: `${statType}_ICON`,
-      zIndex: `${statType}_ICON`
+      texture: statOptions.iconTexture,
+      order: TextureRenderingOrderEnum.UI
     });
 
     const barBackgroundSprite = new Sprite({
       scene: this.scene,
       x: slotSprite.displayWidth / 2,
       y: slotSprite.displayHeight / 2,
-      texture: "BAR_BACKGROUND",
-      zIndex: "BAR_BACKGROUND"
+      texture: Texture.BarBackground,
+      order: TextureRenderingOrderEnum.UI
     }).setOrigin(0, 0.5);
 
     const barOutlineSprite = new Sprite({
       scene: this.scene,
       x: slotSprite.displayWidth / 2,
       y: slotSprite.displayHeight / 2 + 1,
-      texture: "BAR_OUTLINE",
-      zIndex: "BAR_OUTLINE"
+      texture: Texture.BarOutline,
+      order: TextureRenderingOrderEnum.UI
     }).setOrigin(0, 0.5);
 
     this.barRectangleFullWidth =
@@ -72,7 +82,7 @@ class StatGUI extends Phaser.GameObjects.Container {
       barBackgroundSprite.displayHeight / 2,
       this.barRectangleFullWidth,
       barBackgroundSprite.displayHeight - 5,
-      statColors[statType]
+      statOptions.color
     ).setOrigin(0);
 
     this.add([
@@ -84,7 +94,7 @@ class StatGUI extends Phaser.GameObjects.Container {
     ]);
   }
 
-  public update() {
+  update() {
     const { value, barRectangleFullWidth } = this;
 
     this.barRectangle.width = Phaser.Math.Linear(
@@ -96,15 +106,16 @@ class StatGUI extends Phaser.GameObjects.Container {
 }
 
 export class StatsGUI extends Phaser.GameObjects.Container {
+  statGUIs: StatGUI[] = [];
+
   constructor(scene: Phaser.Scene) {
     super(scene, 0, 0, []);
     scene.add.existing(this);
     this.create();
   }
 
-  statGUIs: StatGUI[] = [];
-  private create() {
-    const statTypes = Object.values(StatType);
+  create() {
+    const statTypes = Object.values(Stat);
 
     statTypes.forEach((statType, index) => {
       const statGUI = new StatGUI(this.scene, 0, index * 80, statType);
@@ -114,10 +125,10 @@ export class StatsGUI extends Phaser.GameObjects.Container {
 
     this.setPosition(10, 10);
     this.setScrollFactor(0);
-    this.setDepth(SpriteRenderingOrder.indexOf("STATS"));
+    this.setDepth(TextureRenderingOrderEnum.UI);
   }
 
-  public updateStat(statType: StatType, value: number) {
+  updateStat(statType: Stat, value: number) {
     const statGUI = this.statGUIs.find((statGUI) => statGUI.statType === statType);
 
     if (statGUI) {
@@ -127,9 +138,9 @@ export class StatsGUI extends Phaser.GameObjects.Container {
     return this;
   }
 
-  public updateStats(stats: { [key in StatType]: number }) {
-    Object.entries(stats).forEach(([statType, value]) => {
-      this.updateStat(statType.toUpperCase() as StatType, value);
+  updateStats(stats: { [key in Stat]: number }) {
+    Object.entries(stats).forEach(([stat, value]) => {
+      this.updateStat(stat as Stat, value);
     });
 
     return this;

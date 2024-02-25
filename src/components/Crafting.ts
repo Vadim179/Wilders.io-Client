@@ -1,5 +1,5 @@
 export class Crafting {
-  // public craft(item: InventoryItem) {
+  // craft(item: InventoryItem) {
   //   const recipe = this.getRecipe(item);
   //   if (this.inventory.isFull()) {
   //     throw new Error("Inventory is full");
@@ -11,7 +11,7 @@ export class Crafting {
   //   }
   //   throw new Error("Not enough ingredients");
   // }
-  // public getCaftableItemRecipes() {
+  // getCaftableItemRecipes() {
   //   return CraftingRecipes.filter((recipe) =>
   //     this.hasIngredients(recipe.ingredients)
   //   );

@@ -1,11 +1,13 @@
 import { Socket } from "socket.io-client";
-import { InventoryGUI, StatsGUI } from "./GUI";
 
 import { phaserGameConfig } from "./config/phaserConfig";
 import { assets } from "./config/assets";
 
 import { Player } from "./components/Player";
 import { GameMap } from "./components/Map";
+
+import { StatsGUI } from "./GUI/StatGUI";
+import { InventoryGUI } from "./GUI/InventoryGUI";
 
 export async function initializeGame(
   socket: Socket,
