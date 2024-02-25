@@ -1,12 +1,17 @@
-import { EntityFactory } from "../factories";
-import { StatTypeEnum } from "../enums";
-import { StatType } from "../types";
+import { Sprite } from "../components/Sprite";
 import { SpriteRenderingOrder } from "../config/rendering.config";
+import { Texture } from "../enums/textureEnum";
+
+export enum StatType {
+  Health = "HEALTH"
+  // Hunger = "HUNGER",
+  // Temperature = "TEMPERATURE"
+}
 
 const statColors = {
-  [StatTypeEnum.HEALTH]: 0xee3e75
-  // [StatTypeEnum.HUNGER]: 0xba5c41,
-  // [StatTypeEnum.TEMPERATURE]: 0xa5c7df
+  [StatType.Health]: 0xee3e75
+  // [StatType.Hunger]: 0xba5c41,
+  // [StatType.Temperature]: 0xa5c7df
 };
 
 class StatGUI extends Phaser.GameObjects.Container {
@@ -24,17 +29,17 @@ class StatGUI extends Phaser.GameObjects.Container {
   private create() {
     const { scene, statType } = this;
 
-    const slotSprite = EntityFactory.createSprite({
+    const slotSprite = new Sprite({
       scene: this.scene,
       x: 0,
       y: 0,
-      texture: "SLOT",
+      texture: Texture.Slot,
       zIndex: "SLOT"
     })
       .setScale(0.85)
       .setOrigin(0);
 
-    const slotIconSprite = EntityFactory.createSprite({
+    const slotIconSprite = new Sprite({
       scene: this.scene,
       x: slotSprite.displayWidth / 2,
       y: slotSprite.displayHeight / 2,
@@ -42,7 +47,7 @@ class StatGUI extends Phaser.GameObjects.Container {
       zIndex: `${statType}_ICON`
     });
 
-    const barBackgroundSprite = EntityFactory.createSprite({
+    const barBackgroundSprite = new Sprite({
       scene: this.scene,
       x: slotSprite.displayWidth / 2,
       y: slotSprite.displayHeight / 2,
@@ -50,7 +55,7 @@ class StatGUI extends Phaser.GameObjects.Container {
       zIndex: "BAR_BACKGROUND"
     }).setOrigin(0, 0.5);
 
-    const barOutlineSprite = EntityFactory.createSprite({
+    const barOutlineSprite = new Sprite({
       scene: this.scene,
       x: slotSprite.displayWidth / 2,
       y: slotSprite.displayHeight / 2 + 1,
@@ -99,7 +104,7 @@ export class StatsGUI extends Phaser.GameObjects.Container {
 
   statGUIs: StatGUI[] = [];
   private create() {
-    const statTypes = Object.values(StatTypeEnum);
+    const statTypes = Object.values(StatType);
 
     statTypes.forEach((statType, index) => {
       const statGUI = new StatGUI(this.scene, 0, index * 80, statType);

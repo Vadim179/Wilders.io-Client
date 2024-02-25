@@ -1,5 +1,5 @@
 import { io, Socket } from "socket.io-client";
-import { initializeGame } from "./game.s";
+import { initializeGame } from "./game";
 
 const menu = <HTMLElement>document.querySelector(".main-menu");
 const usernameInput = <HTMLElement>(

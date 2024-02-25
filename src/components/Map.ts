@@ -1,36 +1,22 @@
-import { IMapEntity } from "../types/map.types";
-import { EntityFactory, Sprite } from "../factories";
+import { Sprite } from "./Sprite";
 import { Player } from "./Player";
 import { mapEntities } from "../config/map";
+
+type Entity = (typeof mapEntities)[number];
 
 export class GameMap {
   public static readonly width = 1000;
   public static readonly height = 1000;
 
-  private entities: IMapEntity[] = [];
-  private surroundingEntities: IMapEntity[] = [];
-  private previousSurroundingEntities: IMapEntity[] = [];
+  private surroundingEntities: Entity[] = [];
+  private previousSurroundingEntities: Entity[] = [];
   private renderedSprites: Sprite[] = [];
-
-  constructor() {
-    this.entities = this.loadEntities();
-  }
-
-  /**
-   * Loads the map entities into memory and applies id's to them
-   */
-  private loadEntities() {
-    return mapEntities.map((entity, index) => ({
-      ...entity,
-      id: String(index)
-    }));
-  }
 
   /**
    * Returns a list of all entities that are within the given radius of the given player
    */
   private getSurroundingEntities(player: Player) {
-    return this.entities.filter(
+    return mapEntities.filter(
       (entity) =>
         Math.abs(player.x - entity.x) <= player.sightX &&
         Math.abs(player.y - entity.y) <= player.sightY
@@ -45,7 +31,7 @@ export class GameMap {
       if (this.renderedSprites.some((sprite) => sprite.id === id)) return;
 
       this.renderedSprites.push(
-        EntityFactory.createSprite({ id, texture, scene, x, y, zIndex: texture })
+        new Sprite({ id, texture, scene, x, y, zIndex: texture })
       );
     });
   }

@@ -1,6 +1,7 @@
 import { SpriteRenderingOrder } from "../config/rendering.config";
-import { EntityFactory, SpriteConstructorParams } from "../factories";
+import { Sprite, SpriteConstructorParams } from "./Sprite";
 import { Position } from "../types/mapTypes";
+import { Texture } from "../enums/textureEnum";
 
 interface PlayerConstructorParams extends Omit<SpriteConstructorParams, "texture"> {
   username: string;
@@ -46,21 +47,21 @@ export class Player extends Phaser.GameObjects.Container {
 
     this.rightArmSprite = new PlayerArm({
       scene,
-      texture: "WILDER_LEFT_ARM",
+      texture: Texture.WilderLeftArm,
       x: -armSpriteOffset.x,
       y: armSpriteOffset.y
     });
 
     this.leftArmSprite = new PlayerArm({
       scene,
-      texture: "WILDER_RIGHT_ARM",
+      texture: Texture.WilderRightArm,
       x: armSpriteOffset.x,
       y: armSpriteOffset.y
     });
 
-    this.bodySprite = EntityFactory.createSprite({
+    this.bodySprite = new Sprite({
       scene,
-      texture: "WILDER",
+      texture: Texture.Wilder,
       x: 0,
       y: 0
     });
@@ -147,27 +148,6 @@ export class Player extends Phaser.GameObjects.Container {
     this.attackWithLeft = !this.attackWithLeft; // Toggle the attackWithLeft flag
   }
 
-  // TODO: Refactor this method
-  public equip(type: string, item: string) {
-    if (type === "head") {
-      this.equipedItem = EntityFactory.createSprite({
-        scene: this.scene,
-        texture: item,
-        x: 0,
-        y: -5
-      });
-
-      this.add(this.equipedItem);
-      return;
-    }
-    if (type === "left_arm") {
-      this.rightArmSprite.equip(item);
-    }
-    if (type === "right_arm") {
-      this.leftArmSprite.equip(item);
-    }
-  }
-
   public update() {
     const {
       x,
@@ -202,7 +182,7 @@ export class Player extends Phaser.GameObjects.Container {
 class PlayerArm extends Phaser.GameObjects.Container {
   animationTween: Phaser.Tweens.Tween;
 
-  armTexture: string;
+  armTexture: Texture;
   arm: Phaser.GameObjects.Sprite;
 
   equipedItem: Phaser.GameObjects.Sprite;
@@ -217,7 +197,7 @@ class PlayerArm extends Phaser.GameObjects.Container {
   }
 
   private start() {
-    this.arm = EntityFactory.createSprite({
+    this.arm = new Sprite({
       scene: this.scene,
       texture: this.armTexture,
       x: 0,
@@ -228,23 +208,21 @@ class PlayerArm extends Phaser.GameObjects.Container {
     this.add(this.arm);
   }
 
-  public equip(item: string) {
-    if (this.equipedItem) {
-      this.equipedItem.destroy();
-      this.equipedItem = null;
-    }
+  // public equip(item: string) {
+  //   if (this.equipedItem) {
+  //     this.equipedItem.destroy();
+  //     this.equipedItem = null;
+  //   }
 
-    this.equipedItem = EntityFactory.createSprite({
-      scene: this.scene,
-      texture: item,
-      x: 0,
-      y: -30
-    });
+  //   this.equipedItem = new Sprite({
+  //     scene: this.scene,
+  //     texture: item,
+  //     x: 0,
+  //     y: -30
+  //   });
 
-    this.equipedItem.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM_ITEM"));
-    this.add(this.equipedItem);
-    this.bringToTop(this.arm);
-  }
-
-  public update() {}
+  //   this.equipedItem.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM_ITEM"));
+  //   this.add(this.equipedItem);
+  //   this.bringToTop(this.arm);
+  // }
 }
