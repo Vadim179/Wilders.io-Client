@@ -1,11 +1,11 @@
 import { Item } from "../enums/itemEnum";
 
-interface InventoryItemStack {
+export interface InventoryItemStack {
   item: Item;
   quantity: number;
 }
 
-interface CraftingRecipe {
+export interface CraftingRecipe {
   item: Item;
   quantity: number;
   ingredients: InventoryItemStack[];

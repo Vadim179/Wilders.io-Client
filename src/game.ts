@@ -6,8 +6,9 @@ import { assets } from "./config/assets";
 import { Player } from "./components/Player";
 import { GameMap } from "./components/Map";
 
-import { StatsGUI } from "./GUI/StatGUI";
+import { StatsGUI } from "./GUI/StatsGUI";
 import { InventoryGUI } from "./GUI/InventoryGUI";
+import { CraftingGUI } from "./GUI/CraftingGUI";
 
 export async function initializeGame(
   socket: Socket,
@@ -40,6 +41,7 @@ export async function initializeGame(
 
     statsGUI = new StatsGUI(this);
     const inventoryGUI = new InventoryGUI(this);
+    const craftingGUI = new CraftingGUI(this);
 
     // Movement
     const keyboardInput = {
@@ -146,6 +148,7 @@ export async function initializeGame(
 
     socket.on("inventory_update", (items) => {
       inventoryGUI.update(items);
+      craftingGUI.update(items);
     });
 
     socket.on("tick", ({ stats }) => {

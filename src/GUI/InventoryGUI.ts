@@ -1,10 +1,8 @@
 import { Sprite } from "../components/Sprite";
-import { Item } from "../enums/itemEnum";
 import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
-
-type Slot = [Item | null, number];
+import { Slot } from "../types/inventoryTypes";
 
 class InventorySlotGUI extends Phaser.GameObjects.Container {
   slotSprite: Sprite;
@@ -19,7 +17,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
     this.create();
   }
 
-  private create() {
+  create() {
     const { scene, slot, itemQuantityTextOffset } = this;
 
     this.slotSprite = new Sprite({
@@ -42,7 +40,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
         x: 0,
         y: 0,
         texture: options.texture,
-        order: TextureRenderingOrderEnum.UI + 1
+        order: TextureRenderingOrderEnum.UI
       });
 
       const itemQuantityTextStyle = {

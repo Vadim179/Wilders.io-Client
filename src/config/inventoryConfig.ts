@@ -14,6 +14,10 @@ export const inventoryItemOptionsMap = {
     name: "Wood Sword",
     texture: Texture.WoodSwordItem
   },
+  // [Item.WoodHelmet]: {
+  //   name: "Wood Helmet",
+  //   texture: Texture.CopperHelmet
+  // },
   [Item.Stone]: {
     name: "Stone",
     texture: Texture.Stone

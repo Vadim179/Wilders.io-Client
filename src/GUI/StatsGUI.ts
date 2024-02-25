@@ -118,14 +118,16 @@ export class StatsGUI extends Phaser.GameObjects.Container {
     const statTypes = Object.values(Stat);
 
     statTypes.forEach((statType, index) => {
-      const statGUI = new StatGUI(this.scene, 0, index * 80, statType);
+      const statGUI = new StatGUI(this.scene, 0, (index + 1) * -80, statType);
       this.statGUIs.push(statGUI);
       this.add(statGUI);
     });
 
-    this.setPosition(10, 10);
     this.setScrollFactor(0);
     this.setDepth(TextureRenderingOrderEnum.UI);
+
+    window.addEventListener("resize", () => this.setPosition(10, innerHeight));
+    this.setPosition(10, innerHeight);
   }
 
   updateStat(statType: Stat, value: number) {
