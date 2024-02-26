@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client";
 import { Sprite } from "../components/Sprite";
 import { InventoryItemStack, craftingRecipes } from "../config/craftingRecipes";
 import { inventoryItemOptionsMap } from "../config/inventoryConfig";
@@ -7,9 +8,12 @@ import { Slot } from "../types/inventoryTypes";
 export class CraftingGUI extends Phaser.GameObjects.Container {
   slots: Slot[];
   itemGap = 10;
+  clickEventAbortController: AbortController;
+  socket: Socket;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, socket: Socket) {
     super(scene, 0, 0);
+    this.socket = socket;
     scene.add.existing(this);
     this.slots = new Array(8).fill([null, 0]);
     this.create();
@@ -34,6 +38,7 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
     const columns = 4;
     const itemSize = 64;
     const recipes = this.getCraftableRecipes();
+    const sprites: Sprite[] = [];
 
     recipes.forEach((recipe, index) => {
       const recipeItemOptions = inventoryItemOptionsMap[recipe.item];
@@ -52,8 +57,32 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
       });
 
       sprite.setAlpha(0.75);
+      sprites.push(sprite);
       this.add(sprite);
     });
+
+    this.clickEventAbortController = new AbortController();
+    window.addEventListener(
+      "click",
+      (event) => {
+        sprites.forEach((sprite, index) => {
+          const bounds = sprite.getBounds();
+
+          if (
+            event.clientX > bounds.x &&
+            event.clientX < bounds.x + bounds.width &&
+            event.clientY > bounds.y &&
+            event.clientY < bounds.y + bounds.height
+          ) {
+            const recipe = recipes[index];
+            this.socket.emit("craft", recipe.item);
+          }
+        });
+      },
+      {
+        signal: this.clickEventAbortController.signal
+      }
+    );
 
     this.setPosition(42, 42);
     this.setDepth(TextureRenderingOrderEnum.UI);
@@ -61,6 +90,7 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
   }
 
   update(slots: Slot[]) {
+    this.clickEventAbortController.abort();
     this.slots = slots;
     this.removeAll(true);
     this.create();

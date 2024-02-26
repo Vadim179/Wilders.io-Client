@@ -38,7 +38,7 @@ export class Sprite extends Phaser.GameObjects.Sprite {
     if (hasShadow) {
       this.shadow = this.scene.add.sprite(this.x + 15, this.y + 15, this.texture);
       this.shadow.blendMode = Phaser.BlendModes.ERASE;
-      this.shadow.setAlpha(0.5);
+      this.shadow.setAlpha(0.25);
       this.shadow.setDepth(TextureRenderingOrderEnum.Shadow);
     }
   }

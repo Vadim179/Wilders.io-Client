@@ -41,7 +41,7 @@ export async function initializeGame(
 
     statsGUI = new StatsGUI(this);
     const inventoryGUI = new InventoryGUI(this);
-    const craftingGUI = new CraftingGUI(this);
+    const craftingGUI = new CraftingGUI(this, socket);
 
     // Movement
     const keyboardInput = {
@@ -118,6 +118,7 @@ export async function initializeGame(
       }
     });
 
+    // Make attack from server
     function attack() {
       isAttacking = true;
       if (!canAttack || !isMouseDown) {
