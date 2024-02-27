@@ -9,11 +9,9 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
   slots: Slot[];
   itemGap = 10;
   clickEventAbortController: AbortController;
-  socket: Socket;
 
-  constructor(scene: Phaser.Scene, socket: Socket) {
+  constructor(scene: Phaser.Scene, private socket: Socket) {
     super(scene, 0, 0);
-    this.socket = socket;
     scene.add.existing(this);
     this.slots = new Array(8).fill([null, 0]);
     this.create();

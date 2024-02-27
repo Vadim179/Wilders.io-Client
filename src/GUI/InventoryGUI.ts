@@ -1,3 +1,4 @@
+import { Socket } from "socket.io-client";
 import { Sprite } from "../components/Sprite";
 import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { Texture } from "../enums/textureEnum";
@@ -67,8 +68,9 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   slotGap = 10;
   bottomMargin = 10;
   slots: Slot[];
+  clickEventAbortController: AbortController;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, private socket: Socket) {
     super(scene, 0, 0);
     this.slots = new Array(8).fill([null, 0]);
     scene.add.existing(this);
@@ -85,6 +87,8 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   }
 
   create() {
+    const slotGUIs: InventorySlotGUI[] = [];
+
     this.slots.forEach((slot, index) => {
       const slotGUI = new InventorySlotGUI(this.scene, 0, 0, slot);
 
@@ -95,10 +99,34 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
       );
 
       this.add(slotGUI);
+      slotGUIs.push(slotGUI);
     });
 
     this.setDepth(TextureRenderingOrderEnum.UI);
     this.setScrollFactor(0);
+
+    this.clickEventAbortController = new AbortController();
+    window.addEventListener(
+      "click",
+      (event) => {
+        slotGUIs.forEach((slotGUI, index) => {
+          const bounds = slotGUI.getBounds();
+
+          if (
+            event.clientX > bounds.x &&
+            event.clientX < bounds.x + bounds.width &&
+            event.clientY > bounds.y &&
+            event.clientY < bounds.y + bounds.height
+          ) {
+            const slot = this.slots[index];
+            if (slot[0] !== null) this.socket.emit("inventory_use", index);
+          }
+        });
+      },
+      {
+        signal: this.clickEventAbortController.signal
+      }
+    );
 
     window.addEventListener("resize", () => this.setGUIPosition());
     this.setGUIPosition();

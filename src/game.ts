@@ -40,7 +40,7 @@ export async function initializeGame(
     map = new GameMap().update(player);
 
     statsGUI = new StatsGUI(this);
-    const inventoryGUI = new InventoryGUI(this);
+    const inventoryGUI = new InventoryGUI(this, socket);
     const craftingGUI = new CraftingGUI(this, socket);
 
     // Movement
@@ -150,6 +150,14 @@ export async function initializeGame(
     socket.on("inventory_update", (items) => {
       inventoryGUI.update(items);
       craftingGUI.update(items);
+    });
+
+    socket.on("helmet_update", (item) => {
+      player.updateHelmet(item);
+    });
+
+    socket.on("weapon_or_tool_update", (item) => {
+      player.updateWeaponOrTool(item);
     });
 
     socket.on("tick", ({ stats }) => {
