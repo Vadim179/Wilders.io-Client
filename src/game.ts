@@ -160,7 +160,7 @@ export async function initializeGame(
       player.updateWeaponOrTool(item);
     });
 
-    socket.on("tick", ({ stats }) => {
+    socket.on("stats_update", (stats) => {
       statsGUI.updateStats(stats);
     });
   }

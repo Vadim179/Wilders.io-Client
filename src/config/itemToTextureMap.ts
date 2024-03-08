@@ -7,5 +7,8 @@ export const itemTextureMap = {
   [Item.WoodSword]: Texture.WoodSword,
   [Item.WoodHelmet]: Texture.CopperHelmet,
   [Item.Stone]: Texture.Stone,
-  [Item.Apple]: Texture.Apple
+  [Item.Apple]: Texture.Apple,
+  [Item.StoneHelmet]: Texture.GoldHelmet,
+  [Item.StonePickaxe]: Texture.StonePickaxe,
+  [Item.StoneSword]: Texture.StoneSword
 };
