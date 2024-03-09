@@ -154,6 +154,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     this.slotGUIs = [];
     this.slots = slots;
     this.removeAll(true);
+    this.clickEventAbortController.abort();
     this.create();
   }
 
