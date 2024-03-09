@@ -19,6 +19,7 @@ export async function initializeGame(
   let player: Player;
   let map: GameMap;
   let statsGUI: StatsGUI;
+  let inventoryGUI: InventoryGUI;
 
   new Phaser.Game({
     ...phaserGameConfig,
@@ -34,13 +35,13 @@ export async function initializeGame(
   function create() {
     // Create the player
     player = new Player({ scene: this, username, x: spawnX, y: spawnY });
-    this.cameras.main.startFollow(player, false);
+    this.cameras.main.startFollow(player);
 
     // Create the map
     map = new GameMap().update(player);
 
     statsGUI = new StatsGUI(this);
-    const inventoryGUI = new InventoryGUI(this, socket);
+    inventoryGUI = new InventoryGUI(this, socket);
     const craftingGUI = new CraftingGUI(this, socket);
 
     // Movement
@@ -143,8 +144,8 @@ export async function initializeGame(
 
     // Socket listeners
     socket.on("update", ({ x, y }) => {
-      player.x = x;
-      player.y = y;
+      player.targetX = x;
+      player.targetY = y;
     });
 
     socket.on("inventory_update", (items) => {
@@ -169,5 +170,6 @@ export async function initializeGame(
     player.update();
     map.update(player);
     statsGUI.update();
+    inventoryGUI.sceneUpdate();
   }
 }

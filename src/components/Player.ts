@@ -7,6 +7,7 @@ import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { itemTextureMap } from "../config/itemToTextureMap";
 import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCategoryMap";
 import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
+import { lerp } from "../helpers/lerp";
 
 interface PlayerConstructorParams extends Omit<SpriteConstructorParams, "texture"> {
   username: string;
@@ -20,6 +21,9 @@ const weaponOrToolCategoryToOffsetMap = {
 export class Player extends Phaser.GameObjects.Container {
   sightX = 1440;
   sightY = 900;
+
+  targetX = 0;
+  targetY = 0;
 
   equipedItem: Phaser.GameObjects.Sprite;
 
@@ -44,6 +48,9 @@ export class Player extends Phaser.GameObjects.Container {
 
   constructor({ scene, x, y, username }: PlayerConstructorParams) {
     super(scene, x, y, []);
+
+    this.targetX = x;
+    this.targetY = y;
 
     this.render();
     this.renderUsername(username);
@@ -206,8 +213,8 @@ export class Player extends Phaser.GameObjects.Container {
 
   update() {
     const {
-      x,
-      y,
+      targetX,
+      targetY,
       usernameTextOffset,
       leftArmTween,
       leftArmTargetOffset,
@@ -217,7 +224,9 @@ export class Player extends Phaser.GameObjects.Container {
       rightArmTargetRotation
     } = this;
 
-    this.setPosition(x, y);
+    const newX = lerp(this.x, targetX, 0.1);
+    const newY = lerp(this.y, targetY, 0.1);
+    this.setPosition(newX, newY);
 
     leftArmTween.updateTo("x", leftArmTargetOffset.x, true);
     leftArmTween.updateTo("y", leftArmTargetOffset.y, true);
@@ -229,8 +238,8 @@ export class Player extends Phaser.GameObjects.Container {
     rightArmTween.updateTo("rotation", rightArmTargetRotation, true);
     rightArmTween.restart();
 
-    const usernameTextX = x + usernameTextOffset.x;
-    const usernameTextY = y + usernameTextOffset.y;
+    const usernameTextX = newX + usernameTextOffset.x;
+    const usernameTextY = newY + usernameTextOffset.y;
     this.usernameText.setPosition(usernameTextX, usernameTextY);
   }
 }

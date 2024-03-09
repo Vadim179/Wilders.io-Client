@@ -62,12 +62,32 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
       this.add([this.itemSprite, this.itemQuantityText]);
     }
   }
+
+  update() {
+    const { scene, slotSprite, itemSprite, itemQuantityText } = this;
+    const pointer = scene.input.activePointer;
+    const bounds = slotSprite.getBounds();
+
+    if (
+      pointer.x > bounds.x &&
+      pointer.x < bounds.x + bounds.width &&
+      pointer.y > bounds.y &&
+      pointer.y < bounds.y + bounds.height
+    ) {
+      slotSprite.setScale(1.1);
+      itemSprite?.setScale(1.1);
+    } else {
+      slotSprite.setScale(1.0);
+      itemSprite?.setScale(1.0);
+    }
+  }
 }
 
 export class InventoryGUI extends Phaser.GameObjects.Container {
   slotGap = 10;
   bottomMargin = 10;
   slots: Slot[];
+  slotGUIs: InventorySlotGUI[] = [];
   clickEventAbortController: AbortController;
 
   constructor(scene: Phaser.Scene, private socket: Socket) {
@@ -87,8 +107,6 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   }
 
   create() {
-    const slotGUIs: InventorySlotGUI[] = [];
-
     this.slots.forEach((slot, index) => {
       const slotGUI = new InventorySlotGUI(this.scene, 0, 0, slot);
 
@@ -99,7 +117,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
       );
 
       this.add(slotGUI);
-      slotGUIs.push(slotGUI);
+      this.slotGUIs.push(slotGUI);
     });
 
     this.setDepth(TextureRenderingOrderEnum.UI);
@@ -109,7 +127,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     window.addEventListener(
       "click",
       (event) => {
-        slotGUIs.forEach((slotGUI, index) => {
+        this.slotGUIs.forEach((slotGUI, index) => {
           const bounds = slotGUI.getBounds();
 
           if (
@@ -133,8 +151,13 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   }
 
   update(slots: Slot[]) {
+    this.slotGUIs = [];
     this.slots = slots;
     this.removeAll(true);
     this.create();
+  }
+
+  sceneUpdate() {
+    this.slotGUIs.forEach((slotGUI) => slotGUI.update());
   }
 }
