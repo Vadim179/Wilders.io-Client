@@ -1,4 +1,4 @@
-export const PhaserGameConfig: Phaser.Types.Core.GameConfig = {
+export const phaserGameConfig: Phaser.Types.Core.GameConfig = {
   type: Phaser.CANVAS,
   canvas: document.querySelector("canvas") as HTMLCanvasElement,
   autoFocus: true,

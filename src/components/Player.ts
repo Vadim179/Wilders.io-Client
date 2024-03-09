@@ -1,15 +1,29 @@
-import { SpriteRenderingOrder } from "../config";
-import { EntityFactory, ISpriteConstructorParams } from "../factories";
-import { IPosition } from "../types";
+import { Sprite, SpriteConstructorParams } from "./Sprite";
+import { Position } from "../types/mapTypes";
+import { Texture } from "../enums/textureEnum";
+import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
+import { Item } from "../enums/itemEnum";
+import { inventoryItemOptionsMap } from "../config/inventoryConfig";
+import { itemTextureMap } from "../config/itemToTextureMap";
+import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCategoryMap";
+import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
+import { lerp } from "../helpers/lerp";
 
-interface IPlayerConstructorParams
-  extends Omit<ISpriteConstructorParams, "texture"> {
+interface PlayerConstructorParams extends Omit<SpriteConstructorParams, "texture"> {
   username: string;
 }
+
+const weaponOrToolCategoryToOffsetMap = {
+  [WeaponOrToolCategory.Pickaxe]: { x: 5, y: -5, angle: 45 },
+  [WeaponOrToolCategory.Sword]: { x: 0, y: -30, angle: 0 }
+};
 
 export class Player extends Phaser.GameObjects.Container {
   sightX = 1440;
   sightY = 900;
+
+  targetX = 0;
+  targetY = 0;
 
   equipedItem: Phaser.GameObjects.Sprite;
 
@@ -19,24 +33,30 @@ export class Player extends Phaser.GameObjects.Container {
   usernameText: Phaser.GameObjects.Text;
   bodySprite: Phaser.GameObjects.Sprite;
 
-  leftArmTargetOffset: IPosition;
+  leftArmTargetOffset: Position;
   leftArmTargetRotation = 0;
   leftArmSprite: PlayerArm;
   leftArmTween: Phaser.Tweens.Tween;
 
-  rightArmTargetOffset: IPosition;
+  rightArmTargetOffset: Position;
   rightArmTargetRotation = 0;
   rightArmSprite: PlayerArm;
   rightArmTween: Phaser.Tweens.Tween;
 
-  constructor({ scene, x, y, username }: IPlayerConstructorParams) {
+  helmet: Phaser.GameObjects.Sprite | null = null;
+  weaponOrTool: Phaser.GameObjects.Sprite | null = null;
+
+  constructor({ scene, x, y, username }: PlayerConstructorParams) {
     super(scene, x, y, []);
+
+    this.targetX = x;
+    this.targetY = y;
 
     this.render();
     this.renderUsername(username);
 
-    this.setDepth(SpriteRenderingOrder.indexOf("WILDER"));
-    this.usernameText.setDepth(SpriteRenderingOrder.indexOf("WILDER_USERNAME"));
+    this.setDepth(TextureRenderingOrderEnum.Wilder);
+    this.usernameText.setDepth(TextureRenderingOrderEnum.Username);
 
     this.scene.add.existing(this);
     this.start();
@@ -47,21 +67,21 @@ export class Player extends Phaser.GameObjects.Container {
 
     this.rightArmSprite = new PlayerArm({
       scene,
-      texture: "WILDER_LEFT_ARM",
+      texture: Texture.WilderLeftArm,
       x: -armSpriteOffset.x,
       y: armSpriteOffset.y
     });
 
     this.leftArmSprite = new PlayerArm({
       scene,
-      texture: "WILDER_RIGHT_ARM",
+      texture: Texture.WilderRightArm,
       x: armSpriteOffset.x,
       y: armSpriteOffset.y
     });
 
-    this.bodySprite = EntityFactory.createSprite({
+    this.bodySprite = new Sprite({
       scene,
-      texture: "WILDER",
+      texture: Texture.Wilder,
       x: 0,
       y: 0
     });
@@ -122,8 +142,8 @@ export class Player extends Phaser.GameObjects.Container {
 
   // TODO: Refactor this method
   attackWithLeft = false;
-  public playAttackAnimation() {
-    if (this.attackWithLeft) {
+  playAttackAnimation() {
+    if (this.weaponOrTool || this.attackWithLeft) {
       this.leftArmTargetOffset = { x: 0, y: -70 };
       this.leftArmTargetRotation = -45 * (Math.PI / 180);
       this.rightArmTargetOffset = { x: -60, y: -10 };
@@ -133,7 +153,7 @@ export class Player extends Phaser.GameObjects.Container {
         this.leftArmTargetRotation = 0;
         this.rightArmTargetOffset = { x: -50, y: -30 };
       }, 200);
-    } else {
+    } else if (!this.attackWithLeft) {
       this.rightArmTargetOffset = { x: 0, y: -70 };
       this.rightArmTargetRotation = 45 * (Math.PI / 180);
       this.leftArmTargetOffset = { x: 60, y: -10 };
@@ -145,34 +165,56 @@ export class Player extends Phaser.GameObjects.Container {
       }, 200);
     }
 
-    this.attackWithLeft = !this.attackWithLeft; // Toggle the attackWithLeft flag
+    this.attackWithLeft = this.weaponOrTool ? true : !this.attackWithLeft;
   }
 
-  // TODO: Refactor this method
-  public equip(type: string, item: string) {
-    if (type === "head") {
-      this.equipedItem = EntityFactory.createSprite({
+  updateHelmet(helmet: Item | null) {
+    if (this.helmet !== null) {
+      this.helmet.destroy();
+    }
+
+    if (helmet !== null) {
+      const texture = itemTextureMap[helmet];
+
+      this.helmet = new Sprite({
+        texture,
         scene: this.scene,
-        texture: item,
+        order: TextureRenderingOrderEnum.Helmet,
         x: 0,
-        y: -5
+        y: -5 // TODO: Fix the sprite, not the position
       });
 
-      this.add(this.equipedItem);
-      return;
-    }
-    if (type === "left_arm") {
-      this.rightArmSprite.equip(item);
-    }
-    if (type === "right_arm") {
-      this.leftArmSprite.equip(item);
+      this.add(this.helmet);
     }
   }
 
-  public update() {
+  updateWeaponOrTool(weaponOrTool: Item | null) {
+    if (this.weaponOrTool !== null) {
+      this.weaponOrTool.destroy();
+    }
+
+    if (weaponOrTool !== null) {
+      const texture = itemTextureMap[weaponOrTool];
+      const category = itemToWeaponOrToolCategoryMap[weaponOrTool];
+      const offset = weaponOrToolCategoryToOffsetMap[category];
+
+      this.weaponOrTool = new Sprite({
+        texture,
+        scene: this.scene,
+        order: TextureRenderingOrderEnum.WeaponOrTool,
+        x: offset.x,
+        y: offset.y
+      });
+
+      this.weaponOrTool.setAngle(offset.angle);
+      this.leftArmSprite.addAt(this.weaponOrTool);
+    }
+  }
+
+  update() {
     const {
-      x,
-      y,
+      targetX,
+      targetY,
       usernameTextOffset,
       leftArmTween,
       leftArmTargetOffset,
@@ -182,7 +224,9 @@ export class Player extends Phaser.GameObjects.Container {
       rightArmTargetRotation
     } = this;
 
-    this.setPosition(x, y);
+    const newX = lerp(this.x, targetX, 0.1);
+    const newY = lerp(this.y, targetY, 0.1);
+    this.setPosition(newX, newY);
 
     leftArmTween.updateTo("x", leftArmTargetOffset.x, true);
     leftArmTween.updateTo("y", leftArmTargetOffset.y, true);
@@ -194,8 +238,8 @@ export class Player extends Phaser.GameObjects.Container {
     rightArmTween.updateTo("rotation", rightArmTargetRotation, true);
     rightArmTween.restart();
 
-    const usernameTextX = x + usernameTextOffset.x;
-    const usernameTextY = y + usernameTextOffset.y;
+    const usernameTextX = newX + usernameTextOffset.x;
+    const usernameTextY = newY + usernameTextOffset.y;
     this.usernameText.setPosition(usernameTextX, usernameTextY);
   }
 }
@@ -203,49 +247,25 @@ export class Player extends Phaser.GameObjects.Container {
 class PlayerArm extends Phaser.GameObjects.Container {
   animationTween: Phaser.Tweens.Tween;
 
-  armTexture: string;
+  armTexture: Texture;
   arm: Phaser.GameObjects.Sprite;
 
-  equipedItem: Phaser.GameObjects.Sprite;
-
-  constructor({ scene, x, y, texture }: ISpriteConstructorParams) {
+  constructor({ scene, x, y, texture }: SpriteConstructorParams) {
     super(scene, x, y, []);
     this.armTexture = texture;
-
-    this.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM"));
     this.scene.add.existing(this);
     this.start();
   }
 
   private start() {
-    this.arm = EntityFactory.createSprite({
+    this.arm = new Sprite({
       scene: this.scene,
       texture: this.armTexture,
       x: 0,
-      y: 0
+      y: 0,
+      order: TextureRenderingOrderEnum.WilderArm
     });
 
-    this.arm.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM"));
     this.add(this.arm);
   }
-
-  public equip(item: string) {
-    if (this.equipedItem) {
-      this.equipedItem.destroy();
-      this.equipedItem = null;
-    }
-
-    this.equipedItem = EntityFactory.createSprite({
-      scene: this.scene,
-      texture: item,
-      x: 0,
-      y: -30
-    });
-
-    this.equipedItem.setDepth(SpriteRenderingOrder.indexOf("WILDER_ARM_ITEM"));
-    this.add(this.equipedItem);
-    this.bringToTop(this.arm);
-  }
-
-  public update() {}
 }

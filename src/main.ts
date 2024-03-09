@@ -1,5 +1,4 @@
 import "phaser";
-import "./css/style.css";
-
+import "./style.css";
 import { initializeMainMenu } from "./menu";
 initializeMainMenu();

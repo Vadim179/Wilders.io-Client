@@ -62,7 +62,7 @@ export function initializeMainMenu() {
 
   playButton.addEventListener("click", () => {
     clearNotification();
-    setMenuLoading();
+    setMenuLoading(true);
 
     if (socket) {
       socket.disconnect();
@@ -81,17 +81,15 @@ export function initializeMainMenu() {
       query: { username }
     });
 
-    socket.io.once("reconnect_failed", () => {
+    socket.io.on("reconnect_failed", () => {
       setMenuLoading(false);
       showNotification("Couldn't connect to this server");
       playButton.removeAttribute("disabled");
     });
 
-    socket.once("connect", () => {
-      socket.once("spawn", ({ x, y }) => {
-        hideMenu();
-        initializeGame(socket, username, x, y);
-      });
+    socket.once("init", ({ x, y }) => {
+      hideMenu();
+      initializeGame(socket, username, x, y);
     });
   });
 }

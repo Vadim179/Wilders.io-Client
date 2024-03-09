@@ -1,13 +1,14 @@
 import { Socket } from "socket.io-client";
-import { PhaserGameConfig, Assets } from "./config";
-import { Crafting, GameMap, Inventory, Player } from "./components";
-import { InventoryGUI, StatsGUI } from "./GUI";
 
-declare global {
-  interface Window {
-    crafting: Crafting;
-  }
-}
+import { phaserGameConfig } from "./config/phaserConfig";
+import { assets } from "./config/assets";
+
+import { Player } from "./components/Player";
+import { GameMap } from "./components/Map";
+
+import { StatsGUI } from "./GUI/StatsGUI";
+import { InventoryGUI } from "./GUI/InventoryGUI";
+import { CraftingGUI } from "./GUI/CraftingGUI";
 
 export async function initializeGame(
   socket: Socket,
@@ -18,35 +19,30 @@ export async function initializeGame(
   let player: Player;
   let map: GameMap;
   let statsGUI: StatsGUI;
+  let inventoryGUI: InventoryGUI;
 
   new Phaser.Game({
-    ...PhaserGameConfig,
+    ...phaserGameConfig,
     scene: { preload, create, update }
   });
 
   function preload() {
-    Assets.forEach(({ id, asset }) => {
-      this.load.image(id, `/assets/images/${asset}`);
+    Object.entries(assets).forEach(([name, asset]) => {
+      this.load.image(name, `/assets/images/${asset}`);
     });
   }
 
   function create() {
     // Create the player
     player = new Player({ scene: this, username, x: spawnX, y: spawnY });
-    this.cameras.main.startFollow(player, false);
+    this.cameras.main.startFollow(player);
 
     // Create the map
     map = new GameMap().update(player);
 
-    // Initialize player stats
     statsGUI = new StatsGUI(this);
-
-    // Initialize inventory
-    const inventory = new Inventory(8);
-    new InventoryGUI(this, inventory);
-
-    // Intialize crafting
-    window.crafting = new Crafting(inventory);
+    inventoryGUI = new InventoryGUI(this, socket);
+    const craftingGUI = new CraftingGUI(this, socket);
 
     // Movement
     const keyboardInput = {
@@ -123,6 +119,7 @@ export async function initializeGame(
       }
     });
 
+    // Make attack from server
     function attack() {
       isAttacking = true;
       if (!canAttack || !isMouseDown) {
@@ -147,11 +144,24 @@ export async function initializeGame(
 
     // Socket listeners
     socket.on("update", ({ x, y }) => {
-      player.x = x;
-      player.y = y;
+      player.targetX = x;
+      player.targetY = y;
     });
 
-    socket.on("tick", ({ stats }) => {
+    socket.on("inventory_update", (items) => {
+      inventoryGUI.update(items);
+      craftingGUI.update(items);
+    });
+
+    socket.on("helmet_update", (item) => {
+      player.updateHelmet(item);
+    });
+
+    socket.on("weapon_or_tool_update", (item) => {
+      player.updateWeaponOrTool(item);
+    });
+
+    socket.on("stats_update", (stats) => {
       statsGUI.updateStats(stats);
     });
   }
@@ -160,5 +170,6 @@ export async function initializeGame(
     player.update();
     map.update(player);
     statsGUI.update();
+    inventoryGUI.sceneUpdate();
   }
 }

@@ -1,36 +1,22 @@
-import { MapEntities } from "../config";
-import { IMapEntity } from "../types/map.types";
-import { EntityFactory, Sprite } from "../factories";
+import { Sprite } from "./Sprite";
 import { Player } from "./Player";
+import { mapEntities } from "../config/map";
+
+type Entity = (typeof mapEntities)[number];
 
 export class GameMap {
-  public static readonly width = 1000;
-  public static readonly height = 1000;
+  static readonly width = 1000;
+  static readonly height = 1000;
 
-  private entities: Array<IMapEntity> = [];
-  private surroundingEntities: Array<IMapEntity> = [];
-  private previousSurroundingEntities: Array<IMapEntity> = [];
-  private renderedSprites: Array<Sprite> = [];
-
-  constructor() {
-    this.entities = this.loadEntities();
-  }
-
-  /**
-   * Loads the map entities into memory and applies id's to them
-   */
-  private loadEntities() {
-    return MapEntities.map((entity, index) => ({
-      ...entity,
-      id: String(index)
-    }));
-  }
+  private surroundingEntities: Entity[] = [];
+  private previousSurroundingEntities: Entity[] = [];
+  private renderedSprites: Sprite[] = [];
 
   /**
    * Returns a list of all entities that are within the given radius of the given player
    */
   private getSurroundingEntities(player: Player) {
-    return this.entities.filter(
+    return mapEntities.filter(
       (entity) =>
         Math.abs(player.x - entity.x) <= player.sightX &&
         Math.abs(player.y - entity.y) <= player.sightY
@@ -41,16 +27,14 @@ export class GameMap {
    * Renders the given array of entities to the given scene
    */
   private render(scene: Phaser.Scene) {
-    this.surroundingEntities.forEach(({ id, type: texture, x, y }) => {
+    this.surroundingEntities.forEach(({ id, texture, x, y, order }) => {
       if (this.renderedSprites.some((sprite) => sprite.id === id)) return;
 
-      this.renderedSprites.push(
-        EntityFactory.createSprite({ id, texture, scene, x, y, zIndex: texture })
-      );
+      this.renderedSprites.push(new Sprite({ id, texture, scene, x, y, order }));
     });
   }
 
-  public update(player: Player) {
+  update(player: Player) {
     this.surroundingEntities = this.getSurroundingEntities(player);
 
     // Remove any entities that are no longer in the player's sight radius

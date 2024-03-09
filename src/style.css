@@ -1,6 +1,6 @@
 @font-face {
   font-family: slackey;
-  src: url("../assets/fonts/slackey.ttf");
+  src: url("./assets/fonts/slackey.ttf");
 }
 
 * {
@@ -95,7 +95,7 @@ body {
 }
 
 .main-menu__controls__play-button:disabled {
-  background: #A2B5BB;
+  background: #a2b5bb;
   cursor: default;
 }
 
