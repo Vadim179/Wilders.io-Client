@@ -28,7 +28,7 @@ export class Player extends Phaser.GameObjects.Container {
   equipedItem: Phaser.GameObjects.Sprite;
 
   usernameTextOffset = { x: 0, y: -80 };
-  armSpriteOffset = { x: 50, y: -30 };
+  armSpriteOffset = { x: 45, y: -20 };
 
   usernameText: Phaser.GameObjects.Text;
   bodySprite: Phaser.GameObjects.Sprite;
@@ -146,22 +146,22 @@ export class Player extends Phaser.GameObjects.Container {
     if (this.weaponOrTool || this.attackWithLeft) {
       this.leftArmTargetOffset = { x: 0, y: -70 };
       this.leftArmTargetRotation = -45 * (Math.PI / 180);
-      this.rightArmTargetOffset = { x: -60, y: -10 };
+      this.rightArmTargetOffset = { x: -45, y: -10 };
 
       setTimeout(() => {
-        this.leftArmTargetOffset = { x: 50, y: -30 };
+        this.leftArmTargetOffset = { x: 45, y: -20 };
         this.leftArmTargetRotation = 0;
-        this.rightArmTargetOffset = { x: -50, y: -30 };
+        this.rightArmTargetOffset = { x: -45, y: -20 };
       }, 200);
     } else if (!this.attackWithLeft) {
       this.rightArmTargetOffset = { x: 0, y: -70 };
       this.rightArmTargetRotation = 45 * (Math.PI / 180);
-      this.leftArmTargetOffset = { x: 60, y: -10 };
+      this.leftArmTargetOffset = { x: 45, y: -10 };
 
       setTimeout(() => {
-        this.rightArmTargetOffset = { x: -50, y: -30 };
+        this.rightArmTargetOffset = { x: -45, y: -20 };
         this.rightArmTargetRotation = 0;
-        this.leftArmTargetOffset = { x: 50, y: -30 };
+        this.leftArmTargetOffset = { x: 45, y: -20 };
       }, 200);
     }
 
