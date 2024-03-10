@@ -1,6 +1,6 @@
 import { Sprite } from "./Sprite";
 import { Player } from "./Player";
-import { mapEntities } from "../config/map";
+import { mapDecorations, mapEntities } from "../config/map";
 
 type Entity = (typeof mapEntities)[number];
 
@@ -12,11 +12,16 @@ export class GameMap {
   private previousSurroundingEntities: Entity[] = [];
   private renderedSprites: Sprite[] = [];
 
+  resourceAttack(id: string, angleInRadians: number) {
+    const sprite = this.renderedSprites.find((sprite) => sprite.id === id);
+    if (sprite) sprite.attack(angleInRadians);
+  }
+
   /**
    * Returns a list of all entities that are within the given radius of the given player
    */
   private getSurroundingEntities(player: Player) {
-    return mapEntities.filter(
+    return [...mapEntities, ...mapDecorations].filter(
       (entity) =>
         Math.abs(player.x - entity.x) <= player.sightX &&
         Math.abs(player.y - entity.y) <= player.sightY

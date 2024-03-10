@@ -15,6 +15,7 @@ export class Sprite extends Phaser.GameObjects.Sprite {
   id: string;
   shadow: Phaser.GameObjects.Sprite;
   spriteTexture: Texture;
+  tween: Phaser.Tweens.Tween;
 
   constructor({
     scene,
@@ -41,5 +42,22 @@ export class Sprite extends Phaser.GameObjects.Sprite {
       this.shadow.setAlpha(0.25);
       this.shadow.setDepth(TextureRenderingOrderEnum.Shadow);
     }
+  }
+
+  attack(angleInRadians) {
+    this.tween = this.scene.tweens.add({
+      targets: this,
+      x: this.x + Math.cos(angleInRadians) * 5,
+      y: this.y + Math.sin(angleInRadians) * 5,
+      duration: 100,
+      yoyo: true,
+      ease: "Power1"
+    });
+
+    this.tween.on("complete", () => {
+      console.log("got here");
+      this.tween.remove();
+      this.tween = null;
+    });
   }
 }
