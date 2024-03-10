@@ -27,7 +27,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
       y: 0,
       texture: Texture.Slot,
       order: TextureRenderingOrderEnum.UI,
-    })
+    }).setAlpha(0.85)
 
     this.add(this.slotSprite)
 

@@ -128,7 +128,6 @@ export async function initializeGame(
       }
     })
 
-    // Make attack from server
     function attack() {
       isAttacking = true
       if (!canAttack || !isMouseDown) {
