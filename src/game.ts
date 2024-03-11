@@ -92,6 +92,7 @@ export async function initializeGame(
 
     // Rotation
     let rotation = 0;
+    let lastRotation = 0;
 
     window.addEventListener("mousemove", ({ clientX, clientY }) => {
       rotation = Math.atan2(clientX - innerWidth / 2, -(clientY - innerHeight / 2));
@@ -99,7 +100,9 @@ export async function initializeGame(
     });
 
     setInterval(() => {
+      if (rotation === lastRotation) return;
       socket.emit(SocketEvent.Rotate, rotation);
+      lastRotation = rotation;
     }, 400);
 
     // Attack
