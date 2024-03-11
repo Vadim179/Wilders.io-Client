@@ -19,9 +19,6 @@ const weaponOrToolCategoryToOffsetMap = {
 };
 
 export class Player extends Phaser.GameObjects.Container {
-  sightX = 1440;
-  sightY = 900;
-
   targetX = 0;
   targetY = 0;
 
