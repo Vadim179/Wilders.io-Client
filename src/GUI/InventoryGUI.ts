@@ -1,55 +1,56 @@
-import { Socket } from 'socket.io-client'
-import { Sprite } from '../components/Sprite'
-import { inventoryItemOptionsMap } from '../config/inventoryConfig'
-import { Texture } from '../enums/textureEnum'
-import { TextureRenderingOrderEnum } from '../enums/textureRenderingOrderEnum'
-import { Slot } from '../types/inventoryTypes'
+import { Socket } from "socket.io-client";
+import { Sprite } from "../components/Sprite";
+import { inventoryItemOptionsMap } from "../config/inventoryConfig";
+import { Texture } from "../enums/textureEnum";
+import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
+import { Slot } from "../types/inventoryTypes";
+import { SocketEvent } from "../enums/socketEvent";
 
 class InventorySlotGUI extends Phaser.GameObjects.Container {
-  slotSprite: Sprite
-  itemSprite: Sprite
+  slotSprite: Sprite;
+  itemSprite: Sprite;
 
-  itemQuantityText: Phaser.GameObjects.Text
-  itemQuantityTextOffset = { x: 0, y: -60 }
+  itemQuantityText: Phaser.GameObjects.Text;
+  itemQuantityTextOffset = { x: 0, y: -60 };
 
   constructor(scene: Phaser.Scene, x: number, y: number, private slot: Slot) {
-    super(scene, x, y, [])
-    scene.add.existing(this)
-    this.create()
+    super(scene, x, y, []);
+    scene.add.existing(this);
+    this.create();
   }
 
   create() {
-    const { scene, slot, itemQuantityTextOffset } = this
+    const { scene, slot, itemQuantityTextOffset } = this;
 
     this.slotSprite = new Sprite({
       scene,
       x: 0,
       y: 0,
       texture: Texture.Slot,
-      order: TextureRenderingOrderEnum.UI,
-    }).setAlpha(0.85)
+      order: TextureRenderingOrderEnum.UI
+    }).setAlpha(0.85);
 
-    this.add(this.slotSprite)
+    this.add(this.slotSprite);
 
-    const [item, amount] = slot
+    const [item, amount] = slot;
 
     if (item !== null) {
-      const options = inventoryItemOptionsMap[item]
+      const options = inventoryItemOptionsMap[item];
 
       this.itemSprite = new Sprite({
         scene,
         x: 0,
         y: 0,
         texture: options.texture,
-        order: TextureRenderingOrderEnum.UI,
-      })
+        order: TextureRenderingOrderEnum.UI
+      });
 
       const itemQuantityTextStyle = {
-        color: '#ffffff',
-        fontSize: '12px',
-        fontFamily: 'slackey',
-        align: 'center',
-      }
+        color: "#ffffff",
+        fontSize: "12px",
+        fontFamily: "slackey",
+        align: "center"
+      };
 
       this.itemQuantityText = new Phaser.GameObjects.Text(
         scene,
@@ -57,16 +58,16 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
         itemQuantityTextOffset.y,
         `${amount.toString()}`,
         itemQuantityTextStyle
-      ).setOrigin(0.5)
+      ).setOrigin(0.5);
 
-      this.add([this.itemSprite, this.itemQuantityText])
+      this.add([this.itemSprite, this.itemQuantityText]);
     }
   }
 
   update() {
-    const { scene, slotSprite, itemSprite, itemQuantityText } = this
-    const pointer = scene.input.activePointer
-    const bounds = slotSprite.getBounds()
+    const { scene, slotSprite, itemSprite, itemQuantityText } = this;
+    const pointer = scene.input.activePointer;
+    const bounds = slotSprite.getBounds();
 
     if (
       pointer.x > bounds.x &&
@@ -74,61 +75,61 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
       pointer.y > bounds.y &&
       pointer.y < bounds.y + bounds.height
     ) {
-      slotSprite.setScale(1.1)
-      itemSprite?.setScale(1.1)
+      slotSprite.setScale(1.1);
+      itemSprite?.setScale(1.1);
     } else {
-      slotSprite.setScale(1.0)
-      itemSprite?.setScale(1.0)
+      slotSprite.setScale(1.0);
+      itemSprite?.setScale(1.0);
     }
   }
 }
 
 export class InventoryGUI extends Phaser.GameObjects.Container {
-  slotGap = 10
-  bottomMargin = 10
-  slots: Slot[]
-  slotGUIs: InventorySlotGUI[] = []
-  clickEventAbortController: AbortController
+  slotGap = 10;
+  bottomMargin = 10;
+  slots: Slot[];
+  slotGUIs: InventorySlotGUI[] = [];
+  clickEventAbortController: AbortController;
 
   constructor(scene: Phaser.Scene, private socket: Socket) {
-    super(scene, 0, 0)
-    this.slots = new Array(8).fill([null, 0])
-    scene.add.existing(this)
-    this.create()
+    super(scene, 0, 0);
+    this.slots = new Array(8).fill([null, 0]);
+    scene.add.existing(this);
+    this.create();
   }
 
   setGUIPosition() {
-    const bounds = this.getBounds()
+    const bounds = this.getBounds();
 
     this.setPosition(
       innerWidth / 2 - bounds.width / 2,
       innerHeight - this.bottomMargin
-    )
+    );
   }
 
   create() {
     this.slots.forEach((slot, index) => {
-      const slotGUI = new InventorySlotGUI(this.scene, 0, 0, slot)
+      const slotGUI = new InventorySlotGUI(this.scene, 0, 0, slot);
 
       slotGUI.setPosition(
         index * (slotGUI.slotSprite.width + this.slotGap) +
           slotGUI.slotSprite.width / 2,
         -slotGUI.slotSprite.height / 2
-      )
+      );
 
-      this.add(slotGUI)
-      this.slotGUIs.push(slotGUI)
-    })
+      this.add(slotGUI);
+      this.slotGUIs.push(slotGUI);
+    });
 
-    this.setDepth(TextureRenderingOrderEnum.UI)
-    this.setScrollFactor(0)
+    this.setDepth(TextureRenderingOrderEnum.UI);
+    this.setScrollFactor(0);
 
-    this.clickEventAbortController = new AbortController()
+    this.clickEventAbortController = new AbortController();
     window.addEventListener(
-      'click',
+      "click",
       (event) => {
         this.slotGUIs.forEach((slotGUI, index) => {
-          const bounds = slotGUI.getBounds()
+          const bounds = slotGUI.getBounds();
 
           if (
             event.clientX > bounds.x &&
@@ -136,29 +137,29 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
             event.clientY > bounds.y &&
             event.clientY < bounds.y + bounds.height
           ) {
-            const slot = this.slots[index]
-            if (slot[0] !== null) this.socket.emit('inventory_use', index)
+            const slot = this.slots[index];
+            if (slot[0] !== null) this.socket.emit(SocketEvent.UseItem, index);
           }
-        })
+        });
       },
       {
-        signal: this.clickEventAbortController.signal,
+        signal: this.clickEventAbortController.signal
       }
-    )
+    );
 
-    window.addEventListener('resize', () => this.setGUIPosition())
-    this.setGUIPosition()
+    window.addEventListener("resize", () => this.setGUIPosition());
+    this.setGUIPosition();
   }
 
   update(slots: Slot[]) {
-    this.slotGUIs = []
-    this.slots = slots
-    this.removeAll(true)
-    this.clickEventAbortController.abort()
-    this.create()
+    this.slotGUIs = [];
+    this.slots = slots;
+    this.removeAll(true);
+    this.clickEventAbortController.abort();
+    this.create();
   }
 
   sceneUpdate() {
-    this.slotGUIs.forEach((slotGUI) => slotGUI.update())
+    this.slotGUIs.forEach((slotGUI) => slotGUI.update());
   }
 }

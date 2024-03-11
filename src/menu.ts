@@ -1,5 +1,6 @@
 import { io, Socket } from "socket.io-client";
 import { initializeGame } from "./game";
+import { SocketEvent } from "./enums/socketEvent";
 
 const menu = <HTMLElement>document.querySelector(".main-menu");
 const usernameInput = <HTMLElement>(
@@ -87,7 +88,7 @@ export function initializeMainMenu() {
       playButton.removeAttribute("disabled");
     });
 
-    socket.once("init", ({ x, y }) => {
+    socket.once(SocketEvent.Init, ({ x, y }) => {
       hideMenu();
       initializeGame(socket, username, x, y);
     });

@@ -9,6 +9,7 @@ import { GameMap } from "./components/Map";
 import { StatsGUI } from "./GUI/StatsGUI";
 import { InventoryGUI } from "./GUI/InventoryGUI";
 import { CraftingGUI } from "./GUI/CraftingGUI";
+import { SocketEvent } from "./enums/socketEvent";
 
 export async function initializeGame(
   socket: Socket,
@@ -44,6 +45,8 @@ export async function initializeGame(
     inventoryGUI = new InventoryGUI(this, socket);
     const craftingGUI = new CraftingGUI(this, socket);
 
+    const noClickThroughUIElements = [inventoryGUI, craftingGUI];
+
     // Movement
     const keyboardInput = {
       w: false,
@@ -67,8 +70,8 @@ export async function initializeGame(
       if (e.key === "s") y = 1;
       else if (e.key === "w") y = -1;
 
-      const movement = ["w", "s"].includes(e.key) ? ["y", y] : ["x", x];
-      socket.emit("move", movement);
+      const movement = ["w", "s"].includes(e.key) ? [1, y] : [0, x];
+      socket.emit(SocketEvent.Move, movement);
     });
 
     window.addEventListener("keyup", (e) => {
@@ -83,8 +86,8 @@ export async function initializeGame(
       else if (e.key === "w" && keyboardInput.s) y = 1;
       else if (["w", "s"].includes(e.key)) y = 0;
 
-      const movement = ["w", "s"].includes(e.key) ? ["y", y] : ["x", x];
-      socket.emit("move", movement);
+      const movement = ["w", "s"].includes(e.key) ? [1, y] : [0, x];
+      socket.emit(SocketEvent.Move, movement);
     });
 
     // Rotation
@@ -93,84 +96,63 @@ export async function initializeGame(
     window.addEventListener("mousemove", ({ clientX, clientY }) => {
       rotation = Math.atan2(clientX - innerWidth / 2, -(clientY - innerHeight / 2));
       player.setRotation(rotation);
-      socket.emit("rotate", rotation);
     });
-    const uiElements = [inventoryGUI, craftingGUI];
+
+    setInterval(() => {
+      socket.emit(SocketEvent.Rotate, rotation);
+    }, 400);
 
     // Attack
-    let canAttack = true;
-
-    let isMouseDown = false;
     let isAttacking = false;
 
     this.input.on("pointerdown", (pointer) => {
-      const isClickOnUI = uiElements.some((uiElement) =>
+      const isClickOnUI = noClickThroughUIElements.some((uiElement) =>
         uiElement.getBounds().contains(pointer.x, pointer.y)
       );
       if (isClickOnUI) return;
 
-      isMouseDown = true;
-      if (!isAttacking) {
-        attack();
-      }
+      socket.emit(SocketEvent.AttackStart);
+      isAttacking = true;
     });
 
     this.input.on("pointerup", () => {
-      isMouseDown = false;
-    });
-
-    window.addEventListener("mousemove", () => {
-      if (isMouseDown && !isAttacking) {
-        attack();
-      }
-    });
-
-    function attack() {
-      isAttacking = true;
-      if (!canAttack || !isMouseDown) {
-        isAttacking = false;
-        return;
-      }
-      socket.emit("attack");
-      player.playAttackAnimation();
-
-      setTimeout(() => {
-        if (isMouseDown) {
-          attack();
-        } else {
-          isAttacking = false;
-        }
-      }, 500);
-    }
-
-    window.addEventListener("mouseup", () => {
-      isMouseDown = false;
+      if (!isAttacking) return;
+      socket.emit(SocketEvent.AttackStop);
+      isAttacking = false;
     });
 
     // Socket listeners
-    socket.on("update", ({ x, y }) => {
+    socket.on(SocketEvent.MovementUpdate, (arrayBuffer) => {
+      const dataView = new DataView(arrayBuffer);
+      const x = dataView.getFloat64(0, true);
+      const y = dataView.getFloat64(8, true);
+
       player.targetX = x;
       player.targetY = y;
     });
 
-    socket.on("inventory_update", (items) => {
+    socket.on(SocketEvent.InventoryUpdate, (items) => {
       inventoryGUI.update(items);
       craftingGUI.update(items);
     });
 
-    socket.on("helmet_update", (item) => {
+    socket.on(SocketEvent.HelmetUpdate, (item) => {
       player.updateHelmet(item);
     });
 
-    socket.on("weapon_or_tool_update", (item) => {
+    socket.on(SocketEvent.WeaponOrToolUpdate, (item) => {
       player.updateWeaponOrTool(item);
     });
 
-    socket.on("stats_update", (stats) => {
+    socket.on(SocketEvent.StatsUpdate, (stats) => {
       statsGUI.updateStats(stats);
     });
 
-    socket.on("attack_collectable", ([id, angle]) => {
+    socket.on(SocketEvent.Attack, () => {
+      player.playAttackAnimation();
+    });
+
+    socket.on(SocketEvent.AnimateCollectable, ([id, angle]) => {
       map.resourceAttack(id, angle);
     });
   }
@@ -178,6 +160,7 @@ export async function initializeGame(
   function update() {
     player.update();
     map.update(player);
+
     statsGUI.update();
     inventoryGUI.sceneUpdate();
   }
