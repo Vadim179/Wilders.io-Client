@@ -17,6 +17,7 @@ export async function initializeGame(
   spawnX: number,
   spawnY: number
 ) {
+  const nearbyPlayers: Record<string, Player> = {};
   let player: Player;
   let map: GameMap;
   let statsGUI: StatsGUI;
@@ -134,6 +135,17 @@ export async function initializeGame(
       player.targetY = y;
     });
 
+    socket.on(SocketEvent.MovementUpdateOther, ([id, arrayBuffer]) => {
+      if (id in nearbyPlayers) {
+        const dataView = new DataView(arrayBuffer);
+        const x = dataView.getFloat64(0, true);
+        const y = dataView.getFloat64(8, true);
+
+        nearbyPlayers[id].targetX = x;
+        nearbyPlayers[id].targetY = y;
+      }
+    });
+
     socket.on(SocketEvent.InventoryUpdate, (items) => {
       inventoryGUI.update(items);
       craftingGUI.update(items);
@@ -143,8 +155,22 @@ export async function initializeGame(
       player.updateHelmet(item);
     });
 
+    socket.on(SocketEvent.HelmetUpdateOther, ([id, item]) => {
+      if (id in nearbyPlayers) nearbyPlayers[id].updateHelmet(item);
+    });
+
     socket.on(SocketEvent.WeaponOrToolUpdate, (item) => {
       player.updateWeaponOrTool(item);
+    });
+
+    socket.on(SocketEvent.WeaponOrToolUpdateOther, ([id, item]) => {
+      if (id in nearbyPlayers) nearbyPlayers[id].updateWeaponOrTool(item);
+    });
+
+    socket.on(SocketEvent.RotateOther, ([id, rotation]) => {
+      if (id in nearbyPlayers) {
+        nearbyPlayers[id].targetRotation = rotation;
+      }
     });
 
     socket.on(SocketEvent.StatsUpdate, (stats) => {
@@ -155,13 +181,37 @@ export async function initializeGame(
       player.playAttackAnimation();
     });
 
+    socket.on(SocketEvent.AttackOther, ([id]) => {
+      if (id in nearbyPlayers) nearbyPlayers[id].playAttackAnimation();
+    });
+
     socket.on(SocketEvent.AnimateCollectable, ([id, angle]) => {
       map.resourceAttack(id, angle);
+    });
+
+    socket.on(SocketEvent.PlayerInitialization, ([id, username, x, y, angle]) => {
+      if (id in nearbyPlayers) return;
+      nearbyPlayers[id] = new Player({
+        scene: this,
+        username,
+        x,
+        y,
+        isOtherPlayer: true
+      });
+      nearbyPlayers[id].setRotation(angle);
+    });
+
+    socket.on(SocketEvent.PlayerRemove, (id) => {
+      if (id in nearbyPlayers) {
+        nearbyPlayers[id].destroy();
+        delete nearbyPlayers[id];
+      }
     });
   }
 
   function update() {
     player.update();
+    Object.values(nearbyPlayers).forEach((nearbyPlayer) => nearbyPlayer.update());
     map.update(player);
 
     statsGUI.update();

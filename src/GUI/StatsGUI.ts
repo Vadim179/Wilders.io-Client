@@ -3,9 +3,9 @@ import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
 enum Stat {
-  Health,
   Hunger,
-  Temperature
+  Temperature,
+  Health
 }
 
 const statBarOptions = {

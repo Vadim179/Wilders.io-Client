@@ -3,7 +3,6 @@ import { Position } from "../types/mapTypes";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 import { Item } from "../enums/itemEnum";
-import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { itemTextureMap } from "../config/itemToTextureMap";
 import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCategoryMap";
 import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
@@ -11,6 +10,7 @@ import { lerp } from "../helpers/lerp";
 
 interface PlayerConstructorParams extends Omit<SpriteConstructorParams, "texture"> {
   username: string;
+  isOtherPlayer?: boolean;
 }
 
 const weaponOrToolCategoryToOffsetMap = {
@@ -21,6 +21,8 @@ const weaponOrToolCategoryToOffsetMap = {
 export class Player extends Phaser.GameObjects.Container {
   targetX = 0;
   targetY = 0;
+  targetRotation = 0;
+  isOtherPlayer = false;
 
   equipedItem: Phaser.GameObjects.Sprite;
 
@@ -43,11 +45,18 @@ export class Player extends Phaser.GameObjects.Container {
   helmet: Phaser.GameObjects.Sprite | null = null;
   weaponOrTool: Phaser.GameObjects.Sprite | null = null;
 
-  constructor({ scene, x, y, username }: PlayerConstructorParams) {
+  constructor({
+    scene,
+    x,
+    y,
+    username,
+    isOtherPlayer = false
+  }: PlayerConstructorParams) {
     super(scene, x, y, []);
 
     this.targetX = x;
     this.targetY = y;
+    this.isOtherPlayer = isOtherPlayer;
 
     this.render();
     this.renderUsername(username);
@@ -214,6 +223,8 @@ export class Player extends Phaser.GameObjects.Container {
     const {
       targetX,
       targetY,
+      targetRotation,
+      isOtherPlayer,
       usernameTextOffset,
       leftArmTween,
       leftArmTargetOffset,
@@ -226,6 +237,10 @@ export class Player extends Phaser.GameObjects.Container {
     const newX = lerp(this.x, targetX, 0.1);
     const newY = lerp(this.y, targetY, 0.1);
     this.setPosition(newX, newY);
+
+    if (isOtherPlayer) {
+      this.rotation = lerp(this.rotation, targetRotation, 0.1);
+    }
 
     leftArmTween.updateTo("x", leftArmTargetOffset.x, true);
     leftArmTween.updateTo("y", leftArmTargetOffset.y, true);
@@ -240,6 +255,14 @@ export class Player extends Phaser.GameObjects.Container {
     const usernameTextX = newX + usernameTextOffset.x;
     const usernameTextY = newY + usernameTextOffset.y;
     this.usernameText.setPosition(usernameTextX, usernameTextY);
+  }
+
+  override destroy() {
+    this.leftArmSprite.destroy();
+    this.rightArmSprite.destroy();
+    this.bodySprite.destroy();
+    this.usernameText.destroy();
+    super.destroy();
   }
 }
 
@@ -266,5 +289,10 @@ class PlayerArm extends Phaser.GameObjects.Container {
     });
 
     this.add(this.arm);
+  }
+
+  override destroy() {
+    this.arm.destroy();
+    super.destroy();
   }
 }
