@@ -3,9 +3,9 @@ import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
 enum Stat {
-  Hunger,
-  Temperature,
-  Health
+  Hunger = 0,
+  Temperature = 1,
+  Health = 2
 }
 
 const statBarOptions = {
@@ -159,10 +159,12 @@ export class StatsGUI extends Phaser.GameObjects.Container {
     return this;
   }
 
-  updateStats(stats: Record<Stat, number>) {
-    Object.entries(stats).forEach(([stat, value]) => {
-      this.updateStat(parseInt(stat), value);
-    });
+  updateStats(stats: number[]) {
+    const [health, temperature, hunger] = stats;
+
+    this.updateStat(Stat.Health, health)
+      .updateStat(Stat.Temperature, temperature)
+      .updateStat(Stat.Hunger, hunger);
 
     return this;
   }

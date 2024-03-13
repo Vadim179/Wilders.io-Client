@@ -1,6 +1,7 @@
-import { io, Socket } from "socket.io-client";
 import { initializeGame } from "./game";
 import { SocketEvent } from "./enums/socketEvent";
+import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
+import { spawners } from "./config/map";
 
 const menu = <HTMLElement>document.querySelector(".main-menu");
 const usernameInput = <HTMLElement>(
@@ -59,38 +60,41 @@ export function initializeMainMenu() {
     // server = e.target.value
   });
 
-  let socket: Socket;
+  let socket: WebSocket;
 
   playButton.addEventListener("click", () => {
     clearNotification();
     setMenuLoading(true);
 
     if (socket) {
-      socket.disconnect();
+      socket.close();
       socket = null;
     }
 
     if (username === "") username = "unnamed#" + Math.floor(Math.random() * 9999);
     else if (username.length > 16) username = username.slice(0, 16);
 
-    socket = io("http://172.86.66.19:8000", {
-      autoConnect: true,
-      reconnection: true,
-      reconnectionAttempts: 3,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 3000,
-      query: { username }
-    });
+    socket = new WebSocket("ws://localhost:8000");
+    socket.binaryType = "arraybuffer";
 
-    socket.io.on("reconnect_failed", () => {
-      setMenuLoading(false);
-      showNotification("Couldn't connect to this server");
-      playButton.removeAttribute("disabled");
-    });
+    socket.onclose = function (event) {
+      if (!event.wasClean) {
+        setMenuLoading(false);
+        showNotification("Couldn't connect to this server");
+        playButton.removeAttribute("disabled");
+      }
+    };
 
-    socket.once(SocketEvent.Init, ({ x, y }) => {
-      hideMenu();
-      initializeGame(socket, username, x, y);
-    });
+    socket.onmessage = function (event) {
+      const [eventName, spawnerIndex] = decodeBinaryDataFromServer(event.data);
+
+      if (eventName === SocketEvent.Init) {
+        socket.onmessage = null;
+        const { x, y } = spawners[spawnerIndex];
+
+        hideMenu();
+        initializeGame(socket, username, x, y);
+      }
+    };
   });
 }

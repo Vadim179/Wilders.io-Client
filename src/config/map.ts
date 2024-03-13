@@ -1,6 +1,8 @@
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
+export const spawners = Object.freeze([{ x: 0, y: 0 }]);
+
 // TODO: Generate random rotations
 export const mapDecorations = Object.freeze([
   {

@@ -1,6 +1,7 @@
 import { Sprite } from "./Sprite";
 import { Player } from "./Player";
 import { mapDecorations, mapEntities } from "../config/map";
+import { Position } from "../types/mapTypes";
 
 type Entity = (typeof mapEntities)[number];
 
@@ -38,6 +39,15 @@ export class GameMap {
 
       this.renderedSprites.push(new Sprite({ id, texture, scene, x, y, order }));
     });
+  }
+
+  getEntitiesInRange(position: Position, radius: number) {
+    const entityRadius = 60;
+    return this.surroundingEntities.filter(
+      (entity) =>
+        Math.abs(position.x - entity.x) <= radius + entityRadius &&
+        Math.abs(position.y - entity.y) <= radius + entityRadius
+    );
   }
 
   update(player: Player) {

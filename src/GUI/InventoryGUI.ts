@@ -1,10 +1,10 @@
-import { Socket } from "socket.io-client";
 import { Sprite } from "../components/Sprite";
 import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 import { Slot } from "../types/inventoryTypes";
 import { SocketEvent } from "../enums/socketEvent";
+import { sendBinaryDataToServer } from "../helpers/sendBinaryDataToServer";
 
 class InventorySlotGUI extends Phaser.GameObjects.Container {
   slotSprite: Sprite;
@@ -91,7 +91,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   slotGUIs: InventorySlotGUI[] = [];
   clickEventAbortController: AbortController;
 
-  constructor(scene: Phaser.Scene, private socket: Socket) {
+  constructor(scene: Phaser.Scene, private socket: WebSocket) {
     super(scene, 0, 0);
     this.slots = new Array(8).fill([null, 0]);
     scene.add.existing(this);
@@ -138,7 +138,8 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
             event.clientY < bounds.y + bounds.height
           ) {
             const slot = this.slots[index];
-            if (slot[0] !== null) this.socket.emit(SocketEvent.UseItem, index);
+            if (slot[0] !== null)
+              sendBinaryDataToServer(this.socket, SocketEvent.UseItem, index);
           }
         });
       },
@@ -151,9 +152,22 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     this.setGUIPosition();
   }
 
-  update(slots: Slot[]) {
+  update(slots: number[]) {
+    const changedSlots = [];
+
+    for (let i = 0; i < slots.length; i += 3) {
+      changedSlots.push([slots[i], slots[i + 1], slots[i + 2]]);
+    }
+
     this.slotGUIs = [];
-    this.slots = slots;
+    this.slots = this.slots.map((slot, index) => {
+      const changedSlot = changedSlots.find(
+        (changedSlot) => changedSlot[0] === index
+      );
+
+      return changedSlot ? [changedSlot[1], changedSlot[2]] : slot;
+    });
+
     this.removeAll(true);
     this.clickEventAbortController.abort();
     this.create();
