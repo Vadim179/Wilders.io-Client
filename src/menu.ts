@@ -73,7 +73,7 @@ export function initializeMainMenu() {
     if (username === "") username = "unnamed#" + Math.floor(Math.random() * 9999);
     else if (username.length > 16) username = username.slice(0, 16);
 
-    socket = io("http://localhost:8000", {
+    socket = io("http://172.86.66.19:8000", {
       autoConnect: true,
       reconnection: true,
       reconnectionAttempts: 3,
