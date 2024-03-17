@@ -1,3 +1,4 @@
+// TODO: Separate into client and server enums
 export enum SocketEvent {
   MovementUpdate = 0x00,
   Move = 0x01,
@@ -19,5 +20,6 @@ export enum SocketEvent {
   UseItem = 0x12,
   UseItemOther = 0x13,
   PlayerInitialization = 0x14,
-  PlayerRemove = 0x15
+  PlayerRemove = 0x15,
+  Join = 0x16
 }

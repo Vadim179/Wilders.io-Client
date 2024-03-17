@@ -6,7 +6,7 @@ export const phaserGameConfig: Phaser.Types.Core.GameConfig = {
   backgroundColor: "#9ab855",
   fps: {
     min: 60,
-    target: 120,
+    target: 60,
     smoothStep: true
   },
   render: {

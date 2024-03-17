@@ -2,6 +2,7 @@ import { initializeGame } from "./game";
 import { SocketEvent } from "./enums/socketEvent";
 import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
 import { spawners } from "./config/map";
+import { sendBinaryDataToServer } from "./helpers/sendBinaryDataToServer";
 
 const menu = <HTMLElement>document.querySelector(".main-menu");
 const usernameInput = <HTMLElement>(
@@ -74,8 +75,13 @@ export function initializeMainMenu() {
     if (username === "") username = "unnamed#" + Math.floor(Math.random() * 9999);
     else if (username.length > 16) username = username.slice(0, 16);
 
-    socket = new WebSocket("ws://localhost:8000");
+    // socket = new WebSocket("ws://localhost:8000");
+    socket = new WebSocket("ws://172.86.66.19:8000");
     socket.binaryType = "arraybuffer";
+
+    socket.onopen = function () {
+      sendBinaryDataToServer(socket, SocketEvent.Join, username);
+    };
 
     socket.onclose = function (event) {
       if (!event.wasClean) {
@@ -86,14 +92,15 @@ export function initializeMainMenu() {
     };
 
     socket.onmessage = function (event) {
-      const [eventName, spawnerIndex] = decodeBinaryDataFromServer(event.data);
+      const [eventName, [spawnerIndex, id, otherPlayers]] =
+        decodeBinaryDataFromServer(event.data);
 
       if (eventName === SocketEvent.Init) {
         socket.onmessage = null;
         const { x, y } = spawners[spawnerIndex];
 
         hideMenu();
-        initializeGame(socket, username, x, y);
+        initializeGame(socket, username, x, y, otherPlayers);
       }
     };
   });
