@@ -234,12 +234,12 @@ export class Player extends Phaser.GameObjects.Container {
       rightArmTargetRotation
     } = this;
 
-    const newX = lerp(this.x, targetX, 0.1);
-    const newY = lerp(this.y, targetY, 0.1);
+    const newX = lerp(this.x, targetX, 0.065);
+    const newY = lerp(this.y, targetY, 0.065);
     this.setPosition(newX, newY);
 
     if (isOtherPlayer) {
-      this.rotation = lerp(this.rotation, targetRotation, 0.1);
+      this.rotation = lerp(this.rotation, targetRotation, 0.065);
     }
 
     leftArmTween.updateTo("x", leftArmTargetOffset.x, true);
