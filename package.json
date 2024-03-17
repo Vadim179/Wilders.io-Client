@@ -15,6 +15,7 @@
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/preset-env": "^7.16.11",
+    "@types/msgpack-lite": "^0.1.11",
     "@types/uuid": "^8.3.4",
     "babel-loader": "^8.2.3",
     "copy-webpack-plugin": "^10.2.4",
@@ -33,6 +34,7 @@
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
+    "msgpack-lite": "^0.1.26",
     "phaser": "^3.55.2",
     "socket.io-client": "^4.5.3",
     "uuid": "^9.0.0"

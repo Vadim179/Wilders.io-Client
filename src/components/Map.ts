@@ -1,12 +1,14 @@
 import { Sprite } from "./Sprite";
 import { Player } from "./Player";
 import { mapDecorations, mapEntities } from "../config/map";
+import { Position } from "../types/mapTypes";
 
 type Entity = (typeof mapEntities)[number];
 
 export class GameMap {
   static readonly width = 1000;
   static readonly height = 1000;
+  readonly entitySightRadius = 1200;
 
   private surroundingEntities: Entity[] = [];
   private previousSurroundingEntities: Entity[] = [];
@@ -23,8 +25,8 @@ export class GameMap {
   private getSurroundingEntities(player: Player) {
     return [...mapEntities, ...mapDecorations].filter(
       (entity) =>
-        Math.abs(player.x - entity.x) <= player.sightX &&
-        Math.abs(player.y - entity.y) <= player.sightY
+        Math.abs(player.x - entity.x) <= this.entitySightRadius &&
+        Math.abs(player.y - entity.y) <= this.entitySightRadius
     );
   }
 
@@ -37,6 +39,15 @@ export class GameMap {
 
       this.renderedSprites.push(new Sprite({ id, texture, scene, x, y, order }));
     });
+  }
+
+  getEntitiesInRange(position: Position, radius: number) {
+    const entityRadius = 60;
+    return this.surroundingEntities.filter(
+      (entity) =>
+        Math.abs(position.x - entity.x) <= radius + entityRadius &&
+        Math.abs(position.y - entity.y) <= radius + entityRadius
+    );
   }
 
   update(player: Player) {

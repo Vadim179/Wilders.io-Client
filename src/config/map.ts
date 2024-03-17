@@ -1,15 +1,7 @@
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
-export const texturesWithShadows = [
-  Texture.AppleTree,
-  Texture.LargeDarkOakTree,
-  Texture.LargeOakTree,
-  Texture.MediumDarkOakTree,
-  Texture.MediumOakTree,
-  Texture.SmallDarkOakTree,
-  Texture.SmallOakTree
-];
+export const spawners = Object.freeze([{ x: 0, y: 0 }]);
 
 // TODO: Generate random rotations
 export const mapDecorations = Object.freeze([
