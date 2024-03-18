@@ -134,8 +134,8 @@ export async function initializeGame(
         ? nearbyPlayers[otherPlayerId]
         : player;
 
-      const attackDistance = 40;
-      const attackRadius = 20;
+      const attackDistance = attackingPlayer.weaponOrTool ? 60 : 40;
+      const attackRadius = attackingPlayer.weaponOrTool ? 50 : 40;
       const angle = attackingPlayer.rotation - (90 * Math.PI) / 180;
 
       const attackPosition = {
