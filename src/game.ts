@@ -18,7 +18,7 @@ export async function initializeGame(
   username: string,
   spawnX: number,
   spawnY: number,
-  otherPlayers: any[]
+  otherPlayers: any[],
 ) {
   const nearbyPlayers: Record<string, Player> = {};
 
@@ -29,7 +29,7 @@ export async function initializeGame(
 
   new Phaser.Game({
     ...phaserGameConfig,
-    scene: { preload, create, update }
+    scene: { preload, create, update },
   });
 
   function preload() {
@@ -58,7 +58,7 @@ export async function initializeGame(
         username,
         x,
         y,
-        isOtherPlayer: true
+        isOtherPlayer: true,
       });
       nearbyPlayers[id].setRotation(angle);
     });
@@ -68,7 +68,7 @@ export async function initializeGame(
       w: false,
       a: false,
       s: false,
-      d: false
+      d: false,
     };
 
     let x = 0;
@@ -109,7 +109,10 @@ export async function initializeGame(
     let lastRotation = 0;
 
     window.addEventListener("mousemove", ({ clientX, clientY }) => {
-      rotation = Math.atan2(clientX - innerWidth / 2, -(clientY - innerHeight / 2));
+      rotation = Math.atan2(
+        clientX - innerWidth / 2,
+        -(clientY - innerHeight / 2),
+      );
       player.setRotation(rotation);
     });
 
@@ -118,7 +121,7 @@ export async function initializeGame(
       sendBinaryDataToServer(
         socket,
         SocketEvent.Rotate,
-        Number(rotation.toFixed(1))
+        Number(rotation.toFixed(1)),
       );
       lastRotation = rotation;
     }, 200);
@@ -126,38 +129,26 @@ export async function initializeGame(
     // Attack
     let isAttacking = false;
     function attack(otherPlayerId?: number) {
-      const attackingPlayer = otherPlayerId ? nearbyPlayers[otherPlayerId] : player;
+      const attackingPlayer = otherPlayerId
+        ? nearbyPlayers[otherPlayerId]
+        : player;
       const attackDistance = 40;
       const attackRadius = 20;
       const angle = attackingPlayer.rotation - (90 * Math.PI) / 180;
 
       const attackPosition = {
         x: attackingPlayer.x + Math.cos(angle) * attackDistance,
-        y: attackingPlayer.y + Math.sin(angle) * attackDistance
+        y: attackingPlayer.y + Math.sin(angle) * attackDistance,
       };
 
-<<<<<<< HEAD
-      const entities = map.getEntitiesInRange(attackPosition, attackRadius)
-
-      const players = map.getPlayersInRange(
-        attackPosition,
-        attackRadius,
-        nearbyPlayers
-      )
-
-      players.forEach((player) => player.playDamageAnimation())
-      entities.forEach((body) => map.resourceAttack(body.id, angle))
-      attackingPlayer.playAttackAnimation()
-=======
       const entities = map.getEntitiesInRange(attackPosition, attackRadius);
       entities.forEach((body) => map.resourceAttack(body.id, angle));
       attackingPlayer.playAttackAnimation();
->>>>>>> fdf6a41d9ce2a35e193f6936001aa1c45a089047
     }
 
     this.input.on("pointerdown", (pointer) => {
       const isClickOnUI = noClickThroughUIElements.some((uiElement) =>
-        uiElement.getBounds().contains(pointer.x, pointer.y)
+        uiElement.getBounds().contains(pointer.x, pointer.y),
       );
       if (isClickOnUI) return;
 
@@ -208,7 +199,7 @@ export async function initializeGame(
             username,
             x,
             y,
-            isOtherPlayer: true
+            isOtherPlayer: true,
           });
 
           nearbyPlayers[id].setRotation(angle);
@@ -259,7 +250,9 @@ export async function initializeGame(
 
   function update() {
     player.update();
-    Object.values(nearbyPlayers).forEach((nearbyPlayer) => nearbyPlayer.update());
+    Object.values(nearbyPlayers).forEach((nearbyPlayer) =>
+      nearbyPlayer.update(),
+    );
     map.update(player);
 
     statsGUI.update();
