@@ -12,6 +12,7 @@ import { CraftingGUI } from "./GUI/CraftingGUI";
 import { sendBinaryDataToServer } from "./helpers/sendBinaryDataToServer";
 import { encodeMovement } from "./helpers/encodeMovement";
 import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
+import { createChatGUI } from "./GUI/ChatGUI";
 
 export async function initializeGame(
   socket: WebSocket,
@@ -51,6 +52,7 @@ export async function initializeGame(
     inventoryGUI = new InventoryGUI(this, socket);
     const craftingGUI = new CraftingGUI(this, socket);
     const noClickThroughUIElements = [inventoryGUI, craftingGUI];
+    const { chatBox, chatInput } = createChatGUI();
 
     // Create other players
     otherPlayers.forEach(([id, username, x, y, angle]) => {
@@ -74,9 +76,36 @@ export async function initializeGame(
 
     let x = 0;
     let y = 0;
+    let isTyping = false;
 
     window.addEventListener("keydown", (e) => {
       if (e.repeat) return;
+
+      if (isTyping) {
+        if (e.key === "Enter") {
+          isTyping = false;
+          player.createChatBubble(chatInput.value);
+          sendBinaryDataToServer(socket, SocketEvent.Chat, chatInput.value);
+
+          chatInput.value = "";
+          chatBox.blur();
+          chatBox.style.display = "none";
+          return;
+        }
+
+        return;
+      }
+
+      if (e.key === "Enter") {
+        isTyping = true;
+
+        if (isTyping) {
+          chatBox.style.display = "block";
+          chatInput.focus();
+        }
+
+        return;
+      }
 
       if (e.key in keyboardInput) keyboardInput[e.key] = true;
       else return;
@@ -255,6 +284,11 @@ export async function initializeGame(
         case SocketEvent.WeaponOrToolUpdateOther: {
           const [id, item] = data;
           if (id in nearbyPlayers) nearbyPlayers[id].updateWeaponOrTool(item);
+          break;
+        }
+        case SocketEvent.Chat: {
+          const [id, message] = data;
+          if (id in nearbyPlayers) nearbyPlayers[id].createChatBubble(message);
           break;
         }
       }

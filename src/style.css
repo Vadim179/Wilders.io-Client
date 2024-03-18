@@ -132,3 +132,30 @@ body {
   font-family: slackey;
   color: #ffffff;
 }
+
+.chat-box {
+  width: 400px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% calc(-50% + 100px);
+}
+
+.chat-input {
+  width: 100%;
+  padding: 10px 15px;
+  border-radius: 10px;
+  appearance: none;
+  outline: none;
+  border: none;
+  overflow: auto;
+
+  background-color: rgba(50, 50, 50, 0.75);
+  color: #ffffff;
+  font-family: slackey;
+  font-size: 16px;
+
+  &::placeholder {
+    color: #ffffff;
+  }
+}

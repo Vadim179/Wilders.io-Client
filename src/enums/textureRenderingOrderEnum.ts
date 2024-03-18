@@ -35,6 +35,6 @@ export enum TextureRenderingOrderEnum {
   MediumOakTree,
   LargeDarkOakTree,
   LargeOakTree,
+  ChatBubble,
   UI,
-  RedOverlay,
 }

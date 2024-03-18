@@ -27,7 +27,8 @@ export class Player extends Phaser.GameObjects.Container {
 
   equipedItem: Phaser.GameObjects.Sprite;
 
-  usernameTextOffset = { x: 0, y: -80 };
+  usernameTextOffset = { x: 0, y: -60 };
+  chatBubbleOffset = { x: 0, y: -90 };
   armSpriteOffset = { x: 45, y: -20 };
 
   usernameText: Phaser.GameObjects.Text;
@@ -48,6 +49,8 @@ export class Player extends Phaser.GameObjects.Container {
 
   helmet: Phaser.GameObjects.Sprite | null = null;
   weaponOrTool: Phaser.GameObjects.Sprite | null = null;
+
+  chatBubbles: ChatBubble[] = [];
 
   constructor({
     scene,
@@ -194,6 +197,25 @@ export class Player extends Phaser.GameObjects.Container {
     this.attackWithLeft = this.weaponOrTool ? true : !this.attackWithLeft;
   }
 
+  createChatBubble(text: string) {
+    const { scene, chatBubbleOffset } = this;
+
+    const chatBubble = new ChatBubble(
+      scene,
+      text,
+      chatBubbleOffset.x,
+      chatBubbleOffset.y,
+    );
+
+    chatBubble.on("destroy", () => {
+      this.chatBubbles = this.chatBubbles.filter(
+        (bubble) => bubble !== chatBubble,
+      );
+    });
+
+    this.chatBubbles.unshift(chatBubble);
+  }
+
   playDamageAnimation() {
     if (this.tintTween) {
       return;
@@ -294,6 +316,11 @@ export class Player extends Phaser.GameObjects.Container {
     const usernameTextX = newX + usernameTextOffset.x;
     const usernameTextY = newY + usernameTextOffset.y;
     this.usernameText.setPosition(usernameTextX, usernameTextY);
+
+    this.chatBubbles.forEach((bubble, index) => {
+      bubble.y = newY + usernameTextOffset.y - 30 - 35 * index;
+      bubble.x = newX;
+    });
   }
 
   override destroy() {
@@ -333,5 +360,106 @@ class PlayerArm extends Phaser.GameObjects.Container {
   override destroy() {
     this.arm.destroy();
     super.destroy();
+  }
+}
+
+class ChatBubble extends Phaser.GameObjects.Container {
+  chatBubble: Phaser.GameObjects.Graphics;
+  chatText: Phaser.GameObjects.Text;
+
+  chatBubbleTween: Phaser.Tweens.Tween;
+  chatTextTween: Phaser.Tweens.Tween;
+
+  constructor(scene: Phaser.Scene, text: string, x: number, y: number) {
+    super(scene, x, y);
+    this.depth = TextureRenderingOrderEnum.ChatBubble;
+    this.render(text);
+  }
+
+  private render(text: string) {
+    const { scene } = this;
+
+    this.chatBubble = new Phaser.GameObjects.Graphics(scene);
+
+    this.chatText = new Phaser.GameObjects.Text(scene, 0, 0, text, {
+      align: "center",
+      fontSize: "16px",
+      fontFamily: "slackey",
+    })
+      .setOrigin(0.5)
+      .setAlpha(0);
+
+    this.add([this.chatBubble, this.chatText]);
+    scene.add.existing(this);
+
+    const chatTextBounds = this.chatText.getBounds();
+    const bubbleWidth = chatTextBounds.width + 20;
+    const bubbleHeight = 30;
+
+    this.chatBubble.x = -bubbleWidth / 2;
+    this.chatBubble.y = -bubbleHeight / 2;
+
+    this.chatText.x = this.chatBubble.x + bubbleWidth / 2;
+    this.chatText.y = this.chatBubble.y + bubbleHeight / 2;
+
+    this.chatBubble
+      .clear()
+      .fillStyle(0x000000, 0)
+      .fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 10);
+
+    this.chatTextTween = scene.tweens.add({
+      targets: this.chatText,
+      alpha: 1,
+      duration: 250,
+      ease: "Linear",
+      onComplete: () => {
+        this.chatTextTween.remove();
+
+        this.chatTextTween = scene.tweens.add({
+          targets: this.chatText,
+          alpha: 0,
+          delay: 6000,
+          duration: 250,
+          ease: "Linear",
+        });
+      },
+    });
+
+    let bubbleAlpha = { value: 0 };
+    this.chatBubbleTween = scene.tweens.add({
+      targets: bubbleAlpha,
+      value: 0.5,
+      duration: 250,
+      ease: "Linear",
+      onUpdate: () => {
+        this.chatBubble.clear().fillStyle(0x000000, bubbleAlpha.value);
+        this.chatBubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 10);
+      },
+      onComplete: () => {
+        this.chatBubbleTween = scene.tweens.add({
+          targets: bubbleAlpha,
+          value: 0,
+          delay: 6000,
+          duration: 250,
+          ease: "Linear",
+          onUpdate: () => {
+            this.chatBubble.clear().fillStyle(0x000000, bubbleAlpha.value);
+            this.chatBubble.fillRoundedRect(
+              0,
+              0,
+              bubbleWidth,
+              bubbleHeight,
+              10,
+            );
+          },
+          onComplete: () => {
+            this.chatBubbleTween.remove();
+            this.chatText.destroy();
+            this.chatBubble.destroy();
+            this.destroy();
+          },
+        });
+      },
+    });
   }
 }

@@ -78,8 +78,8 @@ export function initializeMainMenu() {
       username = "unnamed#" + Math.floor(Math.random() * 9999);
     else if (username.length > 16) username = username.slice(0, 16);
 
-    // socket = new WebSocket("ws://localhost:8000");
-    socket = new WebSocket("ws://172.86.66.19:8000");
+    socket = new WebSocket("ws://localhost:8000");
+    // socket = new WebSocket("ws://172.86.66.19:8000");
     socket.binaryType = "arraybuffer";
 
     socket.onopen = function () {
