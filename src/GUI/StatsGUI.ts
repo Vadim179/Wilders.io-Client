@@ -108,6 +108,7 @@ class StatGUI extends Phaser.GameObjects.Container {
       (value / 100) * barRectangleFullWidth,
       0.05
     )
+    // if value === 0, show skull and crossbones
 
     if (value < 30) {
       if (!this.flashTween) {
@@ -125,9 +126,6 @@ class StatGUI extends Phaser.GameObjects.Container {
         this.flashTween = null
         this.barRectangle.alpha = 1
       }
-    }
-    if (value === 0) {
-      window.location.reload()
     }
   }
 }
