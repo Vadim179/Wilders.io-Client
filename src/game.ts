@@ -142,6 +142,14 @@ export async function initializeGame(
       }
 
       const entities = map.getEntitiesInRange(attackPosition, attackRadius)
+
+      const players = map.getPlayersInRange(
+        attackPosition,
+        attackRadius,
+        nearbyPlayers
+      )
+
+      players.forEach((player) => player.playDamageAnimation())
       entities.forEach((body) => map.resourceAttack(body.id, angle))
       attackingPlayer.playAttackAnimation()
     }

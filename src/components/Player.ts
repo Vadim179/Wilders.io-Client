@@ -31,7 +31,7 @@ export class Player extends Phaser.GameObjects.Container {
   armSpriteOffset = { x: 45, y: -20 }
 
   usernameText: Phaser.GameObjects.Text
-  bodySprite: Phaser.GameObjects.Sprite
+  bodySprite: Sprite
 
   leftArmTargetOffset: Position
   leftArmTargetRotation = 0
@@ -42,6 +42,9 @@ export class Player extends Phaser.GameObjects.Container {
   rightArmTargetRotation = 0
   rightArmSprite: PlayerArm
   rightArmTween: Phaser.Tweens.Tween
+
+  tintSprite: Phaser.GameObjects.Ellipse
+  tintTween: Phaser.Tweens.Tween
 
   helmet: Phaser.GameObjects.Sprite | null = null
   weaponOrTool: Phaser.GameObjects.Sprite | null = null
@@ -93,7 +96,25 @@ export class Player extends Phaser.GameObjects.Container {
       y: 0,
     })
 
-    this.add([this.leftArmSprite, this.rightArmSprite, this.bodySprite])
+    this.tintSprite = new Phaser.GameObjects.Ellipse(
+      scene,
+      0,
+      0,
+      this.bodySprite.displayWidth,
+      this.bodySprite.displayHeight,
+      0xff0000,
+      0
+    )
+
+    this.tintSprite.setDepth(TextureRenderingOrderEnum.WilderTint)
+    this.tintSprite.setBlendMode(Phaser.BlendModes.HUE)
+
+    this.add([
+      this.leftArmSprite,
+      this.rightArmSprite,
+      this.bodySprite,
+      this.tintSprite,
+    ])
   }
 
   private renderUsername(username: string) {
@@ -143,8 +164,6 @@ export class Player extends Phaser.GameObjects.Container {
       duration: 200,
       ease: 'Linear',
     })
-
-    this.rotation
   }
 
   // TODO: Refactor this method
@@ -173,6 +192,25 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     this.attackWithLeft = this.weaponOrTool ? true : !this.attackWithLeft
+  }
+
+  playDamageAnimation() {
+    if (this.tintTween) {
+      return
+    }
+
+    this.tintTween = this.scene.tweens.add({
+      targets: this.tintSprite,
+      fillAlpha: 0.3,
+      duration: 150,
+      yoyo: true,
+      ease: 'Linear',
+    })
+
+    this.tintTween.on('complete', () => {
+      this.tintTween.remove()
+      this.tintTween = null
+    })
   }
 
   updateHelmet(helmet: Item | null) {

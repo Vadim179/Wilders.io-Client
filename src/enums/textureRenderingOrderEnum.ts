@@ -22,6 +22,7 @@ export enum TextureRenderingOrderEnum {
   LargeGoldOre,
   WeaponOrTool,
   Wilder,
+  WilderTint,
   Helmet,
   WilderArm,
   Username,
@@ -34,5 +35,6 @@ export enum TextureRenderingOrderEnum {
   MediumOakTree,
   LargeDarkOakTree,
   LargeOakTree,
-  UI
+  UI,
+  RedOverlay,
 }

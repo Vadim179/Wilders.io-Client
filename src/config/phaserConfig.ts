@@ -1,22 +1,22 @@
 export const phaserGameConfig: Phaser.Types.Core.GameConfig = {
-  type: Phaser.CANVAS,
-  canvas: document.querySelector("canvas") as HTMLCanvasElement,
+  type: Phaser.WEBGL,
+  canvas: document.querySelector('canvas') as HTMLCanvasElement,
   autoFocus: true,
   disableContextMenu: true,
-  backgroundColor: "#9ab855",
+  backgroundColor: '#9ab855',
   fps: {
     min: 60,
     target: 60,
-    smoothStep: true
+    smoothStep: true,
   },
   render: {
     roundPixels: true,
     antialias: true,
     antialiasGL: true,
-    powerPreference: "high-performance"
+    powerPreference: 'high-performance',
   },
   scale: {
     mode: Phaser.Scale.RESIZE,
-    autoCenter: Phaser.Scale.CENTER_BOTH
-  }
-};
+    autoCenter: Phaser.Scale.CENTER_BOTH,
+  },
+}
