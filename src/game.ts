@@ -84,8 +84,11 @@ export async function initializeGame(
       if (isTyping) {
         if (e.key === "Enter") {
           isTyping = false;
-          player.createChatBubble(chatInput.value);
-          sendBinaryDataToServer(socket, SocketEvent.Chat, chatInput.value);
+
+          if (chatInput.value) {
+            player.createChatBubble(chatInput.value);
+            sendBinaryDataToServer(socket, SocketEvent.Chat, chatInput.value);
+          }
 
           chatInput.value = "";
           chatBox.blur();
