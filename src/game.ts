@@ -15,6 +15,7 @@ import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer
 
 export async function initializeGame(
   socket: WebSocket,
+  id: number,
   username: string,
   spawnX: number,
   spawnY: number,
@@ -132,6 +133,7 @@ export async function initializeGame(
       const attackingPlayer = otherPlayerId
         ? nearbyPlayers[otherPlayerId]
         : player;
+
       const attackDistance = 40;
       const attackRadius = 20;
       const angle = attackingPlayer.rotation - (90 * Math.PI) / 180;
@@ -142,14 +144,17 @@ export async function initializeGame(
       };
 
       const entities = map.getEntitiesInRange(attackPosition, attackRadius);
+      const players = map.getPlayersInRange(attackPosition, attackRadius, {
+        ...nearbyPlayers,
+        [id]: player,
+      });
 
-      const players = map.getPlayersInRange(
-        attackPosition,
-        attackRadius,
-        nearbyPlayers,
-      );
+      players.forEach((targetPlayer) => {
+        if (targetPlayer !== attackingPlayer) {
+          targetPlayer.playDamageAnimation();
+        }
+      });
 
-      players.forEach((player) => player.playDamageAnimation());
       entities.forEach((body) => map.resourceAttack(body.id, angle));
       attackingPlayer.playAttackAnimation();
     }

@@ -14,7 +14,9 @@ const serverSelect = <HTMLElement>(
 const playButton = <HTMLElement>(
   document.querySelector(".main-menu__controls__play-button")
 );
-const notification = <HTMLElement>document.querySelector(".main-menu__notification");
+const notification = <HTMLElement>(
+  document.querySelector(".main-menu__notification")
+);
 const loader = <HTMLElement>document.querySelector(".main-menu__loader");
 
 export function showMenu() {
@@ -72,7 +74,8 @@ export function initializeMainMenu() {
       socket = null;
     }
 
-    if (username === "") username = "unnamed#" + Math.floor(Math.random() * 9999);
+    if (username === "")
+      username = "unnamed#" + Math.floor(Math.random() * 9999);
     else if (username.length > 16) username = username.slice(0, 16);
 
     // socket = new WebSocket("ws://localhost:8000");
@@ -100,7 +103,7 @@ export function initializeMainMenu() {
         const { x, y } = spawners[spawnerIndex];
 
         hideMenu();
-        initializeGame(socket, username, x, y, otherPlayers);
+        initializeGame(socket, id, username, x, y, otherPlayers);
       }
     };
   });
