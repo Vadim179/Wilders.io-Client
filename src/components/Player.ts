@@ -1,53 +1,53 @@
-import { Sprite, SpriteConstructorParams } from './Sprite'
-import { Position } from '../types/mapTypes'
-import { Texture } from '../enums/textureEnum'
-import { TextureRenderingOrderEnum } from '../enums/textureRenderingOrderEnum'
-import { Item } from '../enums/itemEnum'
-import { itemTextureMap } from '../config/itemToTextureMap'
-import { itemToWeaponOrToolCategoryMap } from '../config/itemToWeaponOrToolCategoryMap'
-import { WeaponOrToolCategory } from '../enums/weaponOrToolCategory'
-import { lerp } from '../helpers/lerp'
+import { Sprite, SpriteConstructorParams } from "./Sprite";
+import { Position } from "../types/mapTypes";
+import { Texture } from "../enums/textureEnum";
+import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
+import { Item } from "../enums/itemEnum";
+import { itemTextureMap } from "../config/itemToTextureMap";
+import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCategoryMap";
+import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
+import { lerp } from "../helpers/lerp";
 
 interface PlayerConstructorParams
-  extends Omit<SpriteConstructorParams, 'texture'> {
-  username: string
-  isOtherPlayer?: boolean
+  extends Omit<SpriteConstructorParams, "texture"> {
+  username: string;
+  isOtherPlayer?: boolean;
 }
 
 const weaponOrToolCategoryToOffsetMap = {
   [WeaponOrToolCategory.Pickaxe]: { x: 5, y: -5, angle: 45 },
   [WeaponOrToolCategory.Sword]: { x: 0, y: -30, angle: 0 },
-}
+};
 
 export class Player extends Phaser.GameObjects.Container {
-  targetX = 0
-  targetY = 0
-  targetRotation = 0
-  isOtherPlayer = false
+  targetX = 0;
+  targetY = 0;
+  targetRotation = 0;
+  isOtherPlayer = false;
 
-  equipedItem: Phaser.GameObjects.Sprite
+  equipedItem: Phaser.GameObjects.Sprite;
 
-  usernameTextOffset = { x: 0, y: -80 }
-  armSpriteOffset = { x: 45, y: -20 }
+  usernameTextOffset = { x: 0, y: -80 };
+  armSpriteOffset = { x: 45, y: -20 };
 
-  usernameText: Phaser.GameObjects.Text
-  bodySprite: Sprite
+  usernameText: Phaser.GameObjects.Text;
+  bodySprite: Sprite;
 
-  leftArmTargetOffset: Position
-  leftArmTargetRotation = 0
-  leftArmSprite: PlayerArm
-  leftArmTween: Phaser.Tweens.Tween
+  leftArmTargetOffset: Position;
+  leftArmTargetRotation = 0;
+  leftArmSprite: PlayerArm;
+  leftArmTween: Phaser.Tweens.Tween;
 
-  rightArmTargetOffset: Position
-  rightArmTargetRotation = 0
-  rightArmSprite: PlayerArm
-  rightArmTween: Phaser.Tweens.Tween
+  rightArmTargetOffset: Position;
+  rightArmTargetRotation = 0;
+  rightArmSprite: PlayerArm;
+  rightArmTween: Phaser.Tweens.Tween;
 
-  tintSprite: Phaser.GameObjects.Ellipse
-  tintTween: Phaser.Tweens.Tween
+  tintSprite: Phaser.GameObjects.Ellipse;
+  tintTween: Phaser.Tweens.Tween;
 
-  helmet: Phaser.GameObjects.Sprite | null = null
-  weaponOrTool: Phaser.GameObjects.Sprite | null = null
+  helmet: Phaser.GameObjects.Sprite | null = null;
+  weaponOrTool: Phaser.GameObjects.Sprite | null = null;
 
   constructor({
     scene,
@@ -56,45 +56,45 @@ export class Player extends Phaser.GameObjects.Container {
     username,
     isOtherPlayer = false,
   }: PlayerConstructorParams) {
-    super(scene, x, y, [])
+    super(scene, x, y, []);
 
-    this.targetX = x
-    this.targetY = y
-    this.isOtherPlayer = isOtherPlayer
+    this.targetX = x;
+    this.targetY = y;
+    this.isOtherPlayer = isOtherPlayer;
 
-    this.render()
-    this.renderUsername(username)
+    this.render();
+    this.renderUsername(username);
 
-    this.setDepth(TextureRenderingOrderEnum.Wilder)
-    this.usernameText.setDepth(TextureRenderingOrderEnum.Username)
+    this.setDepth(TextureRenderingOrderEnum.Wilder);
+    this.usernameText.setDepth(TextureRenderingOrderEnum.Username);
 
-    this.scene.add.existing(this)
-    this.start()
+    this.scene.add.existing(this);
+    this.start();
   }
 
   private render() {
-    const { scene, armSpriteOffset } = this
+    const { scene, armSpriteOffset } = this;
 
     this.rightArmSprite = new PlayerArm({
       scene,
       texture: Texture.WilderLeftArm,
       x: -armSpriteOffset.x,
       y: armSpriteOffset.y,
-    })
+    });
 
     this.leftArmSprite = new PlayerArm({
       scene,
       texture: Texture.WilderRightArm,
       x: armSpriteOffset.x,
       y: armSpriteOffset.y,
-    })
+    });
 
     this.bodySprite = new Sprite({
       scene,
       texture: Texture.Wilder,
       x: 0,
       y: 0,
-    })
+    });
 
     this.tintSprite = new Phaser.GameObjects.Ellipse(
       scene,
@@ -103,49 +103,49 @@ export class Player extends Phaser.GameObjects.Container {
       this.bodySprite.displayWidth,
       this.bodySprite.displayHeight,
       0xff0000,
-      0
-    )
+      0,
+    );
 
-    this.tintSprite.setDepth(TextureRenderingOrderEnum.WilderTint)
-    this.tintSprite.setBlendMode(Phaser.BlendModes.HUE)
+    this.tintSprite.setDepth(TextureRenderingOrderEnum.WilderTint);
+    this.tintSprite.setBlendMode(Phaser.BlendModes.HUE);
 
     this.add([
       this.leftArmSprite,
       this.rightArmSprite,
       this.bodySprite,
       this.tintSprite,
-    ])
+    ]);
   }
 
   private renderUsername(username: string) {
-    const { scene, usernameTextOffset, x, y } = this
+    const { scene, usernameTextOffset, x, y } = this;
 
-    const usernameTextX = x + usernameTextOffset.x
-    const usernameTextY = y + usernameTextOffset.y
+    const usernameTextX = x + usernameTextOffset.x;
+    const usernameTextY = y + usernameTextOffset.y;
 
     const usernameTextStyle: Partial<Phaser.GameObjects.TextStyle> = {
-      align: 'center',
-      fontSize: '16px',
-      fontFamily: 'slackey',
-    }
+      align: "center",
+      fontSize: "16px",
+      fontFamily: "slackey",
+    };
 
     const usernameText = new Phaser.GameObjects.Text(
       scene,
       usernameTextX,
       usernameTextY,
       username,
-      usernameTextStyle
-    ).setOrigin(0.5)
+      usernameTextStyle,
+    ).setOrigin(0.5);
 
-    scene.add.existing(usernameText)
-    this.usernameText = usernameText
+    scene.add.existing(usernameText);
+    this.usernameText = usernameText;
   }
 
   private start() {
-    const { armSpriteOffset } = this
+    const { armSpriteOffset } = this;
 
-    this.leftArmTargetOffset = { ...armSpriteOffset }
-    this.rightArmTargetOffset = { ...armSpriteOffset, x: -armSpriteOffset.x }
+    this.leftArmTargetOffset = { ...armSpriteOffset };
+    this.rightArmTargetOffset = { ...armSpriteOffset, x: -armSpriteOffset.x };
 
     this.leftArmTween = this.scene.tweens.add({
       targets: this.leftArmSprite,
@@ -153,8 +153,8 @@ export class Player extends Phaser.GameObjects.Container {
       y: armSpriteOffset.y,
       rotation: 0,
       duration: 200,
-      ease: 'Linear',
-    })
+      ease: "Linear",
+    });
 
     this.rightArmTween = this.scene.tweens.add({
       targets: this.rightArmSprite,
@@ -162,41 +162,41 @@ export class Player extends Phaser.GameObjects.Container {
       y: armSpriteOffset.y,
       rotation: 0,
       duration: 200,
-      ease: 'Linear',
-    })
+      ease: "Linear",
+    });
   }
 
   // TODO: Refactor this method
-  attackWithLeft = false
+  attackWithLeft = false;
   playAttackAnimation() {
     if (this.weaponOrTool || this.attackWithLeft) {
-      this.leftArmTargetOffset = { x: 0, y: -70 }
-      this.leftArmTargetRotation = -45 * (Math.PI / 180)
-      this.rightArmTargetOffset = { x: -45, y: -10 }
+      this.leftArmTargetOffset = { x: 0, y: -70 };
+      this.leftArmTargetRotation = -45 * (Math.PI / 180);
+      this.rightArmTargetOffset = { x: -45, y: -10 };
 
       setTimeout(() => {
-        this.leftArmTargetOffset = { x: 45, y: -20 }
-        this.leftArmTargetRotation = 0
-        this.rightArmTargetOffset = { x: -45, y: -20 }
-      }, 200)
+        this.leftArmTargetOffset = { x: 45, y: -20 };
+        this.leftArmTargetRotation = 0;
+        this.rightArmTargetOffset = { x: -45, y: -20 };
+      }, 200);
     } else if (!this.attackWithLeft) {
-      this.rightArmTargetOffset = { x: 0, y: -70 }
-      this.rightArmTargetRotation = 45 * (Math.PI / 180)
-      this.leftArmTargetOffset = { x: 45, y: -10 }
+      this.rightArmTargetOffset = { x: 0, y: -70 };
+      this.rightArmTargetRotation = 45 * (Math.PI / 180);
+      this.leftArmTargetOffset = { x: 45, y: -10 };
 
       setTimeout(() => {
-        this.rightArmTargetOffset = { x: -45, y: -20 }
-        this.rightArmTargetRotation = 0
-        this.leftArmTargetOffset = { x: 45, y: -20 }
-      }, 200)
+        this.rightArmTargetOffset = { x: -45, y: -20 };
+        this.rightArmTargetRotation = 0;
+        this.leftArmTargetOffset = { x: 45, y: -20 };
+      }, 200);
     }
 
-    this.attackWithLeft = this.weaponOrTool ? true : !this.attackWithLeft
+    this.attackWithLeft = this.weaponOrTool ? true : !this.attackWithLeft;
   }
 
   playDamageAnimation() {
     if (this.tintTween) {
-      return
+      return;
     }
 
     this.tintTween = this.scene.tweens.add({
@@ -204,23 +204,23 @@ export class Player extends Phaser.GameObjects.Container {
       fillAlpha: 0.3,
       duration: 150,
       yoyo: true,
-      ease: 'Linear',
-    })
+      ease: "Linear",
+    });
 
-    this.tintTween.on('complete', () => {
-      this.tintTween.remove()
-      this.tintTween = null
-    })
+    this.tintTween.on("complete", () => {
+      this.tintTween.remove();
+      this.tintTween = null;
+    });
   }
 
   updateHelmet(helmet: Item | null) {
     if (this.helmet !== null) {
-      this.helmet.destroy()
-      this.helmet = null
+      this.helmet.destroy();
+      this.helmet = null;
     }
 
     if (helmet !== null) {
-      const texture = itemTextureMap[helmet]
+      const texture = itemTextureMap[helmet];
 
       this.helmet = new Sprite({
         texture,
@@ -228,22 +228,22 @@ export class Player extends Phaser.GameObjects.Container {
         order: TextureRenderingOrderEnum.Helmet,
         x: 0,
         y: -5, // TODO: Fix the sprite, not the position
-      })
+      });
 
-      this.add(this.helmet)
+      this.add(this.helmet);
     }
   }
 
   updateWeaponOrTool(weaponOrTool: Item | null) {
     if (this.weaponOrTool !== null) {
-      this.weaponOrTool.destroy()
-      this.weaponOrTool = null
+      this.weaponOrTool.destroy();
+      this.weaponOrTool = null;
     }
 
     if (weaponOrTool !== null) {
-      const texture = itemTextureMap[weaponOrTool]
-      const category = itemToWeaponOrToolCategoryMap[weaponOrTool]
-      const offset = weaponOrToolCategoryToOffsetMap[category]
+      const texture = itemTextureMap[weaponOrTool];
+      const category = itemToWeaponOrToolCategoryMap[weaponOrTool];
+      const offset = weaponOrToolCategoryToOffsetMap[category];
 
       this.weaponOrTool = new Sprite({
         texture,
@@ -251,10 +251,10 @@ export class Player extends Phaser.GameObjects.Container {
         order: TextureRenderingOrderEnum.WeaponOrTool,
         x: offset.x,
         y: offset.y,
-      })
+      });
 
-      this.weaponOrTool.setAngle(offset.angle)
-      this.leftArmSprite.addAt(this.weaponOrTool)
+      this.weaponOrTool.setAngle(offset.angle);
+      this.leftArmSprite.addAt(this.weaponOrTool);
     }
   }
 
@@ -271,51 +271,51 @@ export class Player extends Phaser.GameObjects.Container {
       rightArmTween,
       rightArmTargetOffset,
       rightArmTargetRotation,
-    } = this
+    } = this;
 
-    const newX = lerp(this.x, targetX, 0.075)
-    const newY = lerp(this.y, targetY, 0.075)
-    this.setPosition(newX, newY)
+    const newX = lerp(this.x, targetX, 0.075);
+    const newY = lerp(this.y, targetY, 0.075);
+    this.setPosition(newX, newY);
 
     if (isOtherPlayer) {
-      this.rotation = lerp(this.rotation, targetRotation, 0.075)
+      this.rotation = lerp(this.rotation, targetRotation, 0.075);
     }
 
-    leftArmTween.updateTo('x', leftArmTargetOffset.x, true)
-    leftArmTween.updateTo('y', leftArmTargetOffset.y, true)
-    leftArmTween.updateTo('rotation', leftArmTargetRotation, true)
-    leftArmTween.restart()
+    leftArmTween.updateTo("x", leftArmTargetOffset.x, true);
+    leftArmTween.updateTo("y", leftArmTargetOffset.y, true);
+    leftArmTween.updateTo("rotation", leftArmTargetRotation, true);
+    leftArmTween.restart();
 
-    rightArmTween.updateTo('x', rightArmTargetOffset.x, true)
-    rightArmTween.updateTo('y', rightArmTargetOffset.y, true)
-    rightArmTween.updateTo('rotation', rightArmTargetRotation, true)
-    rightArmTween.restart()
+    rightArmTween.updateTo("x", rightArmTargetOffset.x, true);
+    rightArmTween.updateTo("y", rightArmTargetOffset.y, true);
+    rightArmTween.updateTo("rotation", rightArmTargetRotation, true);
+    rightArmTween.restart();
 
-    const usernameTextX = newX + usernameTextOffset.x
-    const usernameTextY = newY + usernameTextOffset.y
-    this.usernameText.setPosition(usernameTextX, usernameTextY)
+    const usernameTextX = newX + usernameTextOffset.x;
+    const usernameTextY = newY + usernameTextOffset.y;
+    this.usernameText.setPosition(usernameTextX, usernameTextY);
   }
 
   override destroy() {
-    this.leftArmSprite.destroy()
-    this.rightArmSprite.destroy()
-    this.bodySprite.destroy()
-    this.usernameText.destroy()
-    super.destroy()
+    this.leftArmSprite.destroy();
+    this.rightArmSprite.destroy();
+    this.bodySprite.destroy();
+    this.usernameText.destroy();
+    super.destroy();
   }
 }
 
 class PlayerArm extends Phaser.GameObjects.Container {
-  animationTween: Phaser.Tweens.Tween
+  animationTween: Phaser.Tweens.Tween;
 
-  armTexture: Texture
-  arm: Phaser.GameObjects.Sprite
+  armTexture: Texture;
+  arm: Phaser.GameObjects.Sprite;
 
   constructor({ scene, x, y, texture }: SpriteConstructorParams) {
-    super(scene, x, y, [])
-    this.armTexture = texture
-    this.scene.add.existing(this)
-    this.start()
+    super(scene, x, y, []);
+    this.armTexture = texture;
+    this.scene.add.existing(this);
+    this.start();
   }
 
   private start() {
@@ -325,13 +325,13 @@ class PlayerArm extends Phaser.GameObjects.Container {
       x: 0,
       y: 0,
       order: TextureRenderingOrderEnum.WilderArm,
-    })
+    });
 
-    this.add(this.arm)
+    this.add(this.arm);
   }
 
   override destroy() {
-    this.arm.destroy()
-    super.destroy()
+    this.arm.destroy();
+    super.destroy();
   }
 }
