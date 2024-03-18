@@ -5,8 +5,8 @@ export const phaserGameConfig: Phaser.Types.Core.GameConfig = {
   disableContextMenu: true,
   backgroundColor: "#9ab855",
   fps: {
-    min: 120,
-    target: 120,
+    min: 60,
+    target: 60,
     smoothStep: true
   },
   render: {
