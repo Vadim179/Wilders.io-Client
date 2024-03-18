@@ -1,22 +1,22 @@
-import { Sprite } from './Sprite'
-import { Player } from './Player'
-import { mapDecorations, mapEntities } from '../config/map'
-import { Position } from '../types/mapTypes'
+import { Sprite } from "./Sprite";
+import { Player } from "./Player";
+import { mapDecorations, mapEntities } from "../config/map";
+import { Position } from "../types/mapTypes";
 
-type Entity = (typeof mapEntities)[number]
+type Entity = (typeof mapEntities)[number];
 
 export class GameMap {
-  static readonly width = 1000
-  static readonly height = 1000
-  readonly entitySightRadius = 1200
+  static readonly width = 1000;
+  static readonly height = 1000;
+  readonly entitySightRadius = 1200;
 
-  private surroundingEntities: Entity[] = []
-  private previousSurroundingEntities: Entity[] = []
-  private renderedSprites: Sprite[] = []
+  private surroundingEntities: Entity[] = [];
+  private previousSurroundingEntities: Entity[] = [];
+  private renderedSprites: Sprite[] = [];
 
   resourceAttack(id: string, angleInRadians: number) {
-    const sprite = this.renderedSprites.find((sprite) => sprite.id === id)
-    if (sprite) sprite.attack(angleInRadians)
+    const sprite = this.renderedSprites.find((sprite) => sprite.id === id);
+    if (sprite) sprite.attack(angleInRadians);
   }
 
   /**
@@ -26,8 +26,8 @@ export class GameMap {
     return [...mapEntities, ...mapDecorations].filter(
       (entity) =>
         Math.abs(player.x - entity.x) <= this.entitySightRadius &&
-        Math.abs(player.y - entity.y) <= this.entitySightRadius
-    )
+        Math.abs(player.y - entity.y) <= this.entitySightRadius,
+    );
   }
 
   /**
@@ -35,59 +35,61 @@ export class GameMap {
    */
   private render(scene: Phaser.Scene) {
     this.surroundingEntities.forEach(({ id, texture, x, y, order }) => {
-      if (this.renderedSprites.some((sprite) => sprite.id === id)) return
+      if (this.renderedSprites.some((sprite) => sprite.id === id)) return;
 
-      this.renderedSprites.push(new Sprite({ id, texture, scene, x, y, order }))
-    })
+      this.renderedSprites.push(
+        new Sprite({ id, texture, scene, x, y, order }),
+      );
+    });
   }
 
   getEntitiesInRange(position: Position, radius: number) {
-    const entityRadius = 60
+    const entityRadius = 60;
     return this.surroundingEntities.filter(
       (entity) =>
         Math.abs(position.x - entity.x) <= radius + entityRadius &&
-        Math.abs(position.y - entity.y) <= radius + entityRadius
-    )
+        Math.abs(position.y - entity.y) <= radius + entityRadius,
+    );
   }
 
   getPlayersInRange(
     position: Position,
     radius: number,
-    nearbyPlayers: Record<string, Player>
+    nearbyPlayers: Record<string, Player>,
   ) {
-    const entityRadius = 60
+    const entityRadius = 60;
     return Object.values(nearbyPlayers).filter(
       (player) =>
         Math.abs(position.x - player.x) <= radius + entityRadius &&
-        Math.abs(position.y - player.y) <= radius + entityRadius
-    )
-    console.log(nearbyPlayers)
+        Math.abs(position.y - player.y) <= radius + entityRadius,
+    );
+    console.log(nearbyPlayers);
   }
 
   update(player: Player) {
-    this.surroundingEntities = this.getSurroundingEntities(player)
+    this.surroundingEntities = this.getSurroundingEntities(player);
 
     // Remove any entities that are no longer in the player's sight radius
     this.previousSurroundingEntities
       .filter(
         (entity) =>
           !this.surroundingEntities.some((e) => e.id === entity.id) &&
-          this.renderedSprites.some((sprite) => sprite.id === entity.id)
+          this.renderedSprites.some((sprite) => sprite.id === entity.id),
       )
       .forEach((entity) => {
         const sprite = this.renderedSprites.find(
-          (sprite) => sprite.id === entity.id
-        )
+          (sprite) => sprite.id === entity.id,
+        );
 
         this.renderedSprites = this.renderedSprites.filter(
-          (sprite) => sprite.id !== entity.id
-        )
+          (sprite) => sprite.id !== entity.id,
+        );
 
-        sprite?.destroy()
-      })
+        sprite?.destroy();
+      });
 
-    this.render(player.scene)
-    this.previousSurroundingEntities = this.surroundingEntities
-    return this
+    this.render(player.scene);
+    this.previousSurroundingEntities = this.surroundingEntities;
+    return this;
   }
 }

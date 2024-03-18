@@ -10,5 +10,5 @@ export const itemTextureMap = {
   [Item.Apple]: Texture.Apple,
   [Item.StoneHelmet]: Texture.GoldHelmet,
   [Item.StonePickaxe]: Texture.StonePickaxe,
-  [Item.StoneSword]: Texture.StoneSword
+  [Item.StoneSword]: Texture.StoneSword,
 };

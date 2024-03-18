@@ -13,7 +13,12 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
   itemQuantityText: Phaser.GameObjects.Text;
   itemQuantityTextOffset = { x: 0, y: -60 };
 
-  constructor(scene: Phaser.Scene, x: number, y: number, private slot: Slot) {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    private slot: Slot,
+  ) {
     super(scene, x, y, []);
     scene.add.existing(this);
     this.create();
@@ -27,7 +32,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
       x: 0,
       y: 0,
       texture: Texture.Slot,
-      order: TextureRenderingOrderEnum.UI
+      order: TextureRenderingOrderEnum.UI,
     }).setAlpha(0.85);
 
     this.add(this.slotSprite);
@@ -42,14 +47,14 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
         x: 0,
         y: 0,
         texture: options.texture,
-        order: TextureRenderingOrderEnum.UI
+        order: TextureRenderingOrderEnum.UI,
       });
 
       const itemQuantityTextStyle = {
         color: "#ffffff",
         fontSize: "12px",
         fontFamily: "slackey",
-        align: "center"
+        align: "center",
       };
 
       this.itemQuantityText = new Phaser.GameObjects.Text(
@@ -57,7 +62,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
         itemQuantityTextOffset.x,
         itemQuantityTextOffset.y,
         `${amount.toString()}`,
-        itemQuantityTextStyle
+        itemQuantityTextStyle,
       ).setOrigin(0.5);
 
       this.add([this.itemSprite, this.itemQuantityText]);
@@ -91,7 +96,10 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
   slotGUIs: InventorySlotGUI[] = [];
   clickEventAbortController: AbortController;
 
-  constructor(scene: Phaser.Scene, private socket: WebSocket) {
+  constructor(
+    scene: Phaser.Scene,
+    private socket: WebSocket,
+  ) {
     super(scene, 0, 0);
     this.slots = new Array(8).fill([null, 0]);
     scene.add.existing(this);
@@ -103,7 +111,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
 
     this.setPosition(
       innerWidth / 2 - bounds.width / 2,
-      innerHeight - this.bottomMargin
+      innerHeight - this.bottomMargin,
     );
   }
 
@@ -114,7 +122,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
       slotGUI.setPosition(
         index * (slotGUI.slotSprite.width + this.slotGap) +
           slotGUI.slotSprite.width / 2,
-        -slotGUI.slotSprite.height / 2
+        -slotGUI.slotSprite.height / 2,
       );
 
       this.add(slotGUI);
@@ -144,8 +152,8 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
         });
       },
       {
-        signal: this.clickEventAbortController.signal
-      }
+        signal: this.clickEventAbortController.signal,
+      },
     );
 
     window.addEventListener("resize", () => this.setGUIPosition());
@@ -162,7 +170,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     this.slotGUIs = [];
     this.slots = this.slots.map((slot, index) => {
       const changedSlot = changedSlots.find(
-        (changedSlot) => changedSlot[0] === index
+        (changedSlot) => changedSlot[0] === index,
       );
 
       return changedSlot ? [changedSlot[1], changedSlot[2]] : slot;

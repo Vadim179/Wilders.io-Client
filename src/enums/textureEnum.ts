@@ -62,5 +62,5 @@ export enum Texture {
   BarOutline = "BAR_OUTLINE",
   HungerIcon = "HUNGER_ICON",
   HealthIcon = "HEALTH_ICON",
-  TemperatureIcon = "TEMPERATURE_ICON"
+  TemperatureIcon = "TEMPERATURE_ICON",
 }
