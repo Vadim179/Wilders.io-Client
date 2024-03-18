@@ -1,17 +1,17 @@
-import { phaserGameConfig } from "./config/phaserConfig";
-import { assets } from "./config/assets";
-import { SocketEvent } from "./enums/socketEvent";
+import { phaserGameConfig } from './config/phaserConfig'
+import { assets } from './config/assets'
+import { SocketEvent } from './enums/socketEvent'
 
-import { Player } from "./components/Player";
-import { GameMap } from "./components/Map";
+import { Player } from './components/Player'
+import { GameMap } from './components/Map'
 
-import { StatsGUI } from "./GUI/StatsGUI";
-import { InventoryGUI } from "./GUI/InventoryGUI";
-import { CraftingGUI } from "./GUI/CraftingGUI";
+import { StatsGUI } from './GUI/StatsGUI'
+import { InventoryGUI } from './GUI/InventoryGUI'
+import { CraftingGUI } from './GUI/CraftingGUI'
 
-import { sendBinaryDataToServer } from "./helpers/sendBinaryDataToServer";
-import { encodeMovement } from "./helpers/encodeMovement";
-import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
+import { sendBinaryDataToServer } from './helpers/sendBinaryDataToServer'
+import { encodeMovement } from './helpers/encodeMovement'
+import { decodeBinaryDataFromServer } from './helpers/decodeBinaryDataFromServer'
 
 export async function initializeGame(
   socket: WebSocket,
@@ -20,36 +20,36 @@ export async function initializeGame(
   spawnY: number,
   otherPlayers: any[]
 ) {
-  const nearbyPlayers: Record<string, Player> = {};
+  const nearbyPlayers: Record<string, Player> = {}
 
-  let player: Player;
-  let map: GameMap;
-  let statsGUI: StatsGUI;
-  let inventoryGUI: InventoryGUI;
+  let player: Player
+  let map: GameMap
+  let statsGUI: StatsGUI
+  let inventoryGUI: InventoryGUI
 
   new Phaser.Game({
     ...phaserGameConfig,
-    scene: { preload, create, update }
-  });
+    scene: { preload, create, update },
+  })
 
   function preload() {
     Object.entries(assets).forEach(([name, asset]) => {
-      this.load.image(name, `/assets/images/${asset}`);
-    });
+      this.load.image(name, `/assets/images/${asset}`)
+    })
   }
 
   function create() {
     // Create the player
-    player = new Player({ scene: this, username, x: spawnX, y: spawnY });
-    this.cameras.main.startFollow(player);
+    player = new Player({ scene: this, username, x: spawnX, y: spawnY })
+    this.cameras.main.startFollow(player)
 
     // Create the map
-    map = new GameMap().update(player);
+    map = new GameMap().update(player)
 
-    statsGUI = new StatsGUI(this);
-    inventoryGUI = new InventoryGUI(this, socket);
-    const craftingGUI = new CraftingGUI(this, socket);
-    const noClickThroughUIElements = [inventoryGUI, craftingGUI];
+    statsGUI = new StatsGUI(this)
+    inventoryGUI = new InventoryGUI(this, socket)
+    const craftingGUI = new CraftingGUI(this, socket)
+    const noClickThroughUIElements = [inventoryGUI, craftingGUI]
 
     // Create other players
     otherPlayers.forEach(([id, username, x, y, angle]) => {
@@ -58,194 +58,204 @@ export async function initializeGame(
         username,
         x,
         y,
-        isOtherPlayer: true
-      });
-      nearbyPlayers[id].setRotation(angle);
-    });
+        isOtherPlayer: true,
+      })
+      nearbyPlayers[id].setRotation(angle)
+    })
 
     // Movement
     const keyboardInput = {
       w: false,
       a: false,
       s: false,
-      d: false
-    };
+      d: false,
+    }
 
-    let x = 0;
-    let y = 0;
+    let x = 0
+    let y = 0
 
-    window.addEventListener("keydown", (e) => {
-      if (e.repeat) return;
+    window.addEventListener('keydown', (e) => {
+      if (e.repeat) return
 
-      if (e.key in keyboardInput) keyboardInput[e.key] = true;
-      else return;
+      if (e.key in keyboardInput) keyboardInput[e.key] = true
+      else return
 
-      if (e.key === "d") x = 1;
-      else if (e.key === "a") x = 2;
+      if (e.key === 'd') x = 1
+      else if (e.key === 'a') x = 2
 
-      if (e.key === "s") y = 1;
-      else if (e.key === "w") y = 2;
+      if (e.key === 's') y = 1
+      else if (e.key === 'w') y = 2
 
-      sendBinaryDataToServer(socket, SocketEvent.Move, encodeMovement(x, y));
-    });
+      sendBinaryDataToServer(socket, SocketEvent.Move, encodeMovement(x, y))
+    })
 
-    window.addEventListener("keyup", (e) => {
-      if (e.key in keyboardInput) keyboardInput[e.key] = false;
-      else return;
+    window.addEventListener('keyup', (e) => {
+      if (e.key in keyboardInput) keyboardInput[e.key] = false
+      else return
 
-      if (e.key === "d" && keyboardInput.a) x = 2;
-      else if (e.key === "a" && keyboardInput.d) x = 1;
-      else if (["a", "d"].includes(e.key)) x = 0;
+      if (e.key === 'd' && keyboardInput.a) x = 2
+      else if (e.key === 'a' && keyboardInput.d) x = 1
+      else if (['a', 'd'].includes(e.key)) x = 0
 
-      if (e.key === "s" && keyboardInput.w) y = 2;
-      else if (e.key === "w" && keyboardInput.s) y = 1;
-      else if (["w", "s"].includes(e.key)) y = 0;
+      if (e.key === 's' && keyboardInput.w) y = 2
+      else if (e.key === 'w' && keyboardInput.s) y = 1
+      else if (['w', 's'].includes(e.key)) y = 0
 
-      sendBinaryDataToServer(socket, SocketEvent.Move, encodeMovement(x, y));
-    });
+      sendBinaryDataToServer(socket, SocketEvent.Move, encodeMovement(x, y))
+    })
 
     // Rotation
-    let rotation = 0;
-    let lastRotation = 0;
+    let rotation = 0
+    let lastRotation = 0
 
-    window.addEventListener("mousemove", ({ clientX, clientY }) => {
-      rotation = Math.atan2(clientX - innerWidth / 2, -(clientY - innerHeight / 2));
-      player.setRotation(rotation);
-    });
+    window.addEventListener('mousemove', ({ clientX, clientY }) => {
+      rotation = Math.atan2(
+        clientX - innerWidth / 2,
+        -(clientY - innerHeight / 2)
+      )
+      player.setRotation(rotation)
+    })
 
     setInterval(() => {
-      if (rotation === lastRotation) return;
+      if (rotation === lastRotation) return
       sendBinaryDataToServer(
         socket,
         SocketEvent.Rotate,
         Number(rotation.toFixed(1))
-      );
-      lastRotation = rotation;
-    }, 400);
+      )
+      lastRotation = rotation
+    }, 400)
 
     // Attack
-    let isAttacking = false;
+    let isAttacking = false
+    function attack(otherPlayerId?: number) {
+      const attackingPlayer = otherPlayerId
+        ? nearbyPlayers[otherPlayerId]
+        : player
+      const attackDistance = 40
+      const attackRadius = 20
+      const angle = attackingPlayer.rotation - (90 * Math.PI) / 180
 
-    this.input.on("pointerdown", (pointer) => {
+      const attackPosition = {
+        x: attackingPlayer.x + Math.cos(angle) * attackDistance,
+        y: attackingPlayer.y + Math.sin(angle) * attackDistance,
+      }
+
+      const entities = map.getEntitiesInRange(attackPosition, attackRadius)
+      entities.forEach((body) => map.resourceAttack(body.id, angle))
+      attackingPlayer.playAttackAnimation()
+    }
+
+    this.input.on('pointerdown', (pointer) => {
       const isClickOnUI = noClickThroughUIElements.some((uiElement) =>
         uiElement.getBounds().contains(pointer.x, pointer.y)
-      );
-      if (isClickOnUI) return;
+      )
+      if (isClickOnUI) return
 
-      sendBinaryDataToServer(socket, SocketEvent.AttackStart);
-      isAttacking = true;
-    });
+      sendBinaryDataToServer(socket, SocketEvent.AttackStart)
+      isAttacking = true
+    })
 
-    this.input.on("pointerup", () => {
-      if (!isAttacking) return;
-      sendBinaryDataToServer(socket, SocketEvent.AttackStop);
-      isAttacking = false;
-    });
+    this.input.on('pointerup', () => {
+      if (!isAttacking) return
+      sendBinaryDataToServer(socket, SocketEvent.AttackStop)
+      isAttacking = false
+    })
 
     // Socket listeners
     socket.onmessage = (event) => {
-      const [eventName, data] = decodeBinaryDataFromServer(event.data);
+      const [eventName, data] = decodeBinaryDataFromServer(event.data)
 
       switch (eventName) {
         case SocketEvent.MovementUpdate:
           {
-            const [x, y] = data;
-            player.targetX = x;
-            player.targetY = y;
+            const [x, y] = data
+            player.targetX = x
+            player.targetY = y
           }
-          break;
+          break
         case SocketEvent.Attack: {
-          const attackDistance = 40;
-          const attackRadius = 20;
-          const angle = player.rotation - (90 * Math.PI) / 180;
-
-          const attackPosition = {
-            x: player.x + Math.cos(angle) * attackDistance,
-            y: player.y + Math.sin(angle) * attackDistance
-          };
-
-          const entities = map.getEntitiesInRange(attackPosition, attackRadius);
-          entities.forEach((body) => map.resourceAttack(body.id, angle));
-          player.playAttackAnimation();
-          break;
+          attack(data)
+          break
         }
         case SocketEvent.StatsUpdate:
-          statsGUI.updateStats(data);
-          break;
+          statsGUI.updateStats(data)
+          break
         case SocketEvent.InventoryUpdate:
-          inventoryGUI.update(data);
-          craftingGUI.update(data);
-          break;
+          inventoryGUI.update(data)
+          craftingGUI.update(data)
+          break
         case SocketEvent.HelmetUpdate:
-          player.updateHelmet(data);
-          break;
+          player.updateHelmet(data)
+          break
         case SocketEvent.WeaponOrToolUpdate:
-          player.updateWeaponOrTool(data);
-          break;
+          player.updateWeaponOrTool(data)
+          break
         case SocketEvent.PlayerInitialization: {
-          const [id, username, x, y, angle] = data;
+          const [id, username, x, y, angle] = data
 
           nearbyPlayers[id] = new Player({
             scene: this,
             username,
             x,
             y,
-            isOtherPlayer: true
-          });
+            isOtherPlayer: true,
+          })
 
-          nearbyPlayers[id].setRotation(angle);
-          break;
+          nearbyPlayers[id].setRotation(angle)
+          break
         }
         case SocketEvent.PlayerRemove: {
-          const id = data;
+          const id = data
           if (id in nearbyPlayers) {
-            nearbyPlayers[id].destroy();
-            delete nearbyPlayers[id];
+            nearbyPlayers[id].destroy()
+            delete nearbyPlayers[id]
           }
-          break;
+          break
         }
         // TODO: Stream using peer to peer
         case SocketEvent.MovementUpdateOther: {
-          const [id, x, y] = data;
+          const [id, x, y] = data
           if (id in nearbyPlayers) {
-            nearbyPlayers[id].targetX = x;
-            nearbyPlayers[id].targetY = y;
+            nearbyPlayers[id].targetX = x
+            nearbyPlayers[id].targetY = y
           }
-          break;
+          break
         }
         // TODO: Stream using peer to peer
         case SocketEvent.RotateOther: {
-          const [id, rotation] = data;
+          const [id, rotation] = data
           if (id in nearbyPlayers) {
-            nearbyPlayers[id].targetRotation = rotation;
+            nearbyPlayers[id].targetRotation = rotation
           }
-          break;
+          break
         }
         case SocketEvent.AttackOther: {
-          const id = data;
-          if (id in nearbyPlayers) nearbyPlayers[id].playAttackAnimation();
-          break;
+          attack(data)
+          break
         }
         case SocketEvent.HelmetUpdateOther: {
-          const [id, item] = data;
-          if (id in nearbyPlayers) nearbyPlayers[id].updateHelmet(item);
-          break;
+          const [id, item] = data
+          if (id in nearbyPlayers) nearbyPlayers[id].updateHelmet(item)
+          break
         }
         case SocketEvent.WeaponOrToolUpdateOther: {
-          const [id, item] = data;
-          if (id in nearbyPlayers) nearbyPlayers[id].updateWeaponOrTool(item);
-          break;
+          const [id, item] = data
+          if (id in nearbyPlayers) nearbyPlayers[id].updateWeaponOrTool(item)
+          break
         }
       }
-    };
+    }
   }
 
   function update() {
-    player.update();
-    Object.values(nearbyPlayers).forEach((nearbyPlayer) => nearbyPlayer.update());
-    map.update(player);
+    player.update()
+    Object.values(nearbyPlayers).forEach((nearbyPlayer) =>
+      nearbyPlayer.update()
+    )
+    map.update(player)
 
-    statsGUI.update();
-    inventoryGUI.sceneUpdate();
+    statsGUI.update()
+    inventoryGUI.sceneUpdate()
   }
 }
