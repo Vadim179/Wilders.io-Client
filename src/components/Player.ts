@@ -314,6 +314,8 @@ export class Player extends Phaser.GameObjects.Container {
     rightArmTween.updateTo("rotation", rightArmTargetRotation, true);
     rightArmTween.restart();
 
+    this.emit("positionChanged", { x: this.x, y: this.y });
+
     const usernameTextX = newX + usernameTextOffset.x;
     const usernameTextY = newY + usernameTextOffset.y;
     this.usernameText.setPosition(usernameTextX, usernameTextY);

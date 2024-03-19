@@ -13,6 +13,7 @@ import { sendBinaryDataToServer } from "./helpers/sendBinaryDataToServer";
 import { encodeMovement } from "./helpers/encodeMovement";
 import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
 import { createChatGUI } from "./GUI/ChatGUI";
+import { MiniMap } from "./GUI/MiniMapGUI";
 
 export async function initializeGame(
   socket: WebSocket,
@@ -28,6 +29,7 @@ export async function initializeGame(
   let map: GameMap;
   let statsGUI: StatsGUI;
   let inventoryGUI: InventoryGUI;
+  let miniMap: MiniMap;
 
   new Phaser.Game({
     ...phaserGameConfig,
@@ -50,6 +52,11 @@ export async function initializeGame(
 
     statsGUI = new StatsGUI(this);
     inventoryGUI = new InventoryGUI(this, socket);
+    miniMap = new MiniMap(
+      this,
+      phaserGameConfig.canvas.width,
+      phaserGameConfig.canvas.height,
+    );
     const craftingGUI = new CraftingGUI(this, socket);
     const noClickThroughUIElements = [inventoryGUI, craftingGUI];
     const { chatBox, chatInput } = createChatGUI();
@@ -303,7 +310,7 @@ export async function initializeGame(
       nearbyPlayer.update(),
     );
     map.update(player);
-
+    miniMap.updateMiniMap({ x: player.x, y: player.y });
     statsGUI.update();
     inventoryGUI.sceneUpdate();
   }
