@@ -138,26 +138,25 @@ export async function initializeGame(
     });
 
     // Rotation
-    let rotation = 0;
-    let lastRotation = 0;
+    let angle = 0;
+    let lastAngle = 0;
 
     window.addEventListener("mousemove", ({ clientX, clientY }) => {
-      rotation = Math.atan2(
-        clientX - innerWidth / 2,
-        -(clientY - innerHeight / 2),
+      angle = Number(
+        (
+          Math.atan2(clientX - innerWidth / 2, -(clientY - innerHeight / 2)) *
+          (180 / Math.PI)
+        ).toFixed(0),
       );
-      player.setRotation(rotation);
+
+      player.setAngle(angle);
     });
 
     setInterval(() => {
-      if (rotation === lastRotation) return;
-      sendBinaryDataToServer(
-        socket,
-        SocketEvent.Rotate,
-        Number(rotation.toFixed(1)),
-      );
-      lastRotation = rotation;
-    }, 200);
+      if (angle === lastAngle) return;
+      sendBinaryDataToServer(socket, SocketEvent.Rotate, angle);
+      lastAngle = angle;
+    }, 300);
 
     // Attack
     let isAttacking = false;
@@ -247,7 +246,7 @@ export async function initializeGame(
             isOtherPlayer: true,
           });
 
-          nearbyPlayers[id].setRotation(angle);
+          nearbyPlayers[id].setAngle(angle);
           break;
         }
         case SocketEvent.PlayerRemove: {
@@ -269,9 +268,9 @@ export async function initializeGame(
         }
         // TODO: Stream using peer to peer
         case SocketEvent.RotateOther: {
-          const [id, rotation] = data;
+          const [id, angle] = data;
           if (id in nearbyPlayers) {
-            nearbyPlayers[id].targetRotation = rotation;
+            nearbyPlayers[id].targetAngle = angle;
           }
           break;
         }

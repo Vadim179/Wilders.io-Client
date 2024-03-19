@@ -1,3 +1,3 @@
-export function lerp(start, end, t) {
-  return start * (1 - t) + end * t;
+export function lerp(a: number, b: number, t: number) {
+  return a * (1 - t) + b * t;
 }

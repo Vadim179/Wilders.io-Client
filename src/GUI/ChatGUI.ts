@@ -1,7 +1,12 @@
 export function createChatGUI() {
   const chatBox = document.createElement("div");
 
-  chatBox.classList.add("chat-box", "animate__animated", "animate__bounceIn");
+  chatBox.classList.add(
+    "chat-box",
+    "animate__animated",
+    "animate__zoomIn",
+    "animate__faster",
+  );
   chatBox.style.display = "none";
 
   const chatInput = document.createElement("input");

@@ -7,6 +7,7 @@ import { itemTextureMap } from "../config/itemToTextureMap";
 import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCategoryMap";
 import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
 import { lerp } from "../helpers/lerp";
+import { lerpAngle } from "../helpers/lerpAngle";
 
 interface PlayerConstructorParams
   extends Omit<SpriteConstructorParams, "texture"> {
@@ -22,7 +23,7 @@ const weaponOrToolCategoryToOffsetMap = {
 export class Player extends Phaser.GameObjects.Container {
   targetX = 0;
   targetY = 0;
-  targetRotation = 0;
+  targetAngle = 0;
   isOtherPlayer = false;
 
   equipedItem: Phaser.GameObjects.Sprite;
@@ -284,7 +285,7 @@ export class Player extends Phaser.GameObjects.Container {
     const {
       targetX,
       targetY,
-      targetRotation,
+      targetAngle,
       isOtherPlayer,
       usernameTextOffset,
       leftArmTween,
@@ -300,7 +301,7 @@ export class Player extends Phaser.GameObjects.Container {
     this.setPosition(newX, newY);
 
     if (isOtherPlayer) {
-      this.rotation = lerp(this.rotation, targetRotation, 0.075);
+      this.angle = lerpAngle(this.angle, targetAngle, 0.075);
     }
 
     leftArmTween.updateTo("x", leftArmTargetOffset.x, true);
