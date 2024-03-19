@@ -156,7 +156,7 @@ export async function initializeGame(
       if (angle === lastAngle) return;
       sendBinaryDataToServer(socket, SocketEvent.Rotate, angle);
       lastAngle = angle;
-    }, 200);
+    }, 300);
 
     // Attack
     let isAttacking = false;
