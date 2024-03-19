@@ -13,6 +13,7 @@ export function createChatGUI() {
 
   chatInput.classList.add("chat-input");
   chatInput.placeholder = "Type a message...";
+  chatInput.maxLength = 64;
 
   chatBox.appendChild(chatInput);
   document.body.appendChild(chatBox);
