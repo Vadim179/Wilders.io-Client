@@ -160,7 +160,7 @@ export class StatsGUI extends Phaser.GameObjects.Container {
       (statGUI) => statGUI.statType === statType,
     );
 
-    if (statGUI) {
+    if (statGUI && statGUI.value !== value) {
       statGUI.value = value;
     }
 
@@ -170,10 +170,9 @@ export class StatsGUI extends Phaser.GameObjects.Container {
   updateStats(stats: number[]) {
     const [health, temperature, hunger] = stats;
 
-    if (typeof health === "number") this.updateStat(Stat.Health, health);
-    if (typeof temperature === "number")
-      this.updateStat(Stat.Temperature, temperature);
-    if (typeof hunger === "number") this.updateStat(Stat.Hunger, hunger);
+    this.updateStat(Stat.Health, health)
+      .updateStat(Stat.Temperature, temperature)
+      .updateStat(Stat.Hunger, hunger);
 
     return this;
   }

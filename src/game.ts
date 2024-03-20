@@ -220,33 +220,37 @@ export async function initializeGame(
 
       switch (eventName) {
         case SocketEvent.Tick: {
-          data.forEach((playerPayload) => {
+          // cut data into array elements of 9
+          const chunkSize = 9;
+
+          const dataChunks = data.reduce(
+            (acc, _, i) =>
+              i % chunkSize ? acc : [...acc, data.slice(i, i + chunkSize)],
+            [],
+          );
+
+          dataChunks.forEach((playerPayload) => {
+            const [thisId, x, y, angle, weaponOrTool, helmet, ...stats] =
+              playerPayload;
+
             let thisPlayer: Player | null = null;
 
-            if (playerPayload.i in nearbyPlayers) {
-              thisPlayer = nearbyPlayers[playerPayload.i];
-            } else if (playerPayload.i === id) {
+            if (thisId in nearbyPlayers) {
+              thisPlayer = nearbyPlayers[thisId];
+            } else if (thisId === id) {
               thisPlayer = player;
             }
 
             if (thisPlayer) {
-              if ("x" in playerPayload) thisPlayer.targetX = playerPayload.x;
-              if ("y" in playerPayload) thisPlayer.targetY = playerPayload.y;
-              if ("a" in playerPayload)
-                thisPlayer.targetAngle = playerPayload.a;
+              thisPlayer.targetX = x;
+              thisPlayer.targetY = y;
+              thisPlayer.targetAngle = angle;
 
-              if ("b" in playerPayload)
-                thisPlayer.updateWeaponOrTool(playerPayload.b);
-              if ("c" in playerPayload)
-                thisPlayer.updateHelmet(playerPayload.c);
+              if (weaponOrTool !== thisPlayer.weaponOrTool)
+                thisPlayer.updateWeaponOrTool(weaponOrTool);
+              if (helmet !== thisPlayer.helmet) thisPlayer.updateHelmet(helmet);
 
               if (thisPlayer === player) {
-                const stats = [
-                  playerPayload.d,
-                  playerPayload.e,
-                  playerPayload.f,
-                ];
-
                 statsGUI.updateStats(stats);
               }
             }
