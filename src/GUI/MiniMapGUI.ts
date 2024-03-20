@@ -1,3 +1,5 @@
+import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
+
 export class MiniMap {
   private scene: Phaser.Scene;
   private miniMapGraphics: Phaser.GameObjects.Graphics;
@@ -12,15 +14,22 @@ export class MiniMap {
     this.miniMapHeight = 200;
 
     // Create mini-map graphics
-    this.miniMapGraphics = this.scene.add.graphics();
-    this.miniMapGraphics.setScrollFactor(0);
+    this.miniMapGraphics = this.scene.add
+      .graphics()
+      .setScrollFactor(0)
+      .setDepth(TextureRenderingOrderEnum.UI);
 
     // Position mini-map at the bottom right corner of the window
-    const miniMapX = canvasWidth - this.miniMapWidth - 20;
-    const miniMapY = canvasHeight - this.miniMapHeight - 20;
+    const miniMapX = innerWidth - this.miniMapWidth - 20;
+    const miniMapY = innerHeight - this.miniMapHeight - 20;
 
     this.miniMapGraphics.x = miniMapX;
     this.miniMapGraphics.y = miniMapY;
+
+    window.addEventListener("resize", () => {
+      this.miniMapGraphics.x = innerWidth - this.miniMapWidth - 20;
+      this.miniMapGraphics.y = innerHeight - this.miniMapHeight - 20;
+    });
 
     this.miniMapGraphics.fillStyle(0x000000, 1);
     this.miniMapGraphics.fillRect(0, 0, this.miniMapWidth, this.miniMapHeight);
