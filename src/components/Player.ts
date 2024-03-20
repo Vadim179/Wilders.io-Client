@@ -10,7 +10,8 @@ import { lerp } from "../helpers/lerp";
 import { lerpAngle } from "../helpers/lerpAngle";
 
 interface PlayerConstructorParams
-  extends Omit<SpriteConstructorParams, "texture"> {
+  extends Omit<SpriteConstructorParams, "texture" | "id"> {
+  id: number;
   username: string;
   isOtherPlayer?: boolean;
 }
@@ -21,6 +22,8 @@ const weaponOrToolCategoryToOffsetMap = {
 };
 
 export class Player extends Phaser.GameObjects.Container {
+  id: number;
+
   targetX = 0;
   targetY = 0;
   targetAngle = 0;
@@ -54,6 +57,7 @@ export class Player extends Phaser.GameObjects.Container {
   chatBubbles: ChatBubble[] = [];
 
   constructor({
+    id,
     scene,
     x,
     y,
@@ -62,6 +66,7 @@ export class Player extends Phaser.GameObjects.Container {
   }: PlayerConstructorParams) {
     super(scene, x, y, []);
 
+    this.id = id;
     this.targetX = x;
     this.targetY = y;
     this.isOtherPlayer = isOtherPlayer;

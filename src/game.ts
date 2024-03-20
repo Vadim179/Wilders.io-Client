@@ -44,7 +44,7 @@ export async function initializeGame(
 
   function create() {
     // Create the player
-    player = new Player({ scene: this, username, x: spawnX, y: spawnY });
+    player = new Player({ id, scene: this, username, x: spawnX, y: spawnY });
     this.cameras.main.startFollow(player);
 
     // Create the map
@@ -64,6 +64,7 @@ export async function initializeGame(
     // Create other players
     otherPlayers.forEach(([id, username, x, y, angle]) => {
       nearbyPlayers[id] = new Player({
+        id,
         scene: this,
         username,
         x,
@@ -218,34 +219,53 @@ export async function initializeGame(
       const [eventName, data] = decodeBinaryDataFromServer(event.data);
 
       switch (eventName) {
-        case SocketEvent.MovementUpdate:
-          {
-            const [x, y] = data;
-            player.targetX = x;
-            player.targetY = y;
-          }
+        case SocketEvent.Tick: {
+          data.forEach((playerPayload) => {
+            let thisPlayer: Player | null = null;
+
+            if (playerPayload.i in nearbyPlayers) {
+              thisPlayer = nearbyPlayers[playerPayload.i];
+            } else if (playerPayload.i === id) {
+              thisPlayer = player;
+            }
+
+            if (thisPlayer) {
+              if ("x" in playerPayload) thisPlayer.targetX = playerPayload.x;
+              if ("y" in playerPayload) thisPlayer.targetY = playerPayload.y;
+              if ("a" in playerPayload)
+                thisPlayer.targetAngle = playerPayload.a;
+
+              if ("b" in playerPayload)
+                thisPlayer.updateWeaponOrTool(playerPayload.b);
+              if ("c" in playerPayload)
+                thisPlayer.updateHelmet(playerPayload.c);
+
+              if (thisPlayer === player) {
+                const stats = [
+                  playerPayload.d,
+                  playerPayload.e,
+                  playerPayload.f,
+                ];
+
+                statsGUI.updateStats(stats);
+              }
+            }
+          });
           break;
+        }
         case SocketEvent.Attack: {
           attack(data);
           break;
         }
-        case SocketEvent.StatsUpdate:
-          statsGUI.updateStats(data);
-          break;
         case SocketEvent.InventoryUpdate:
           inventoryGUI.update(data);
           craftingGUI.update(data);
-          break;
-        case SocketEvent.HelmetUpdate:
-          player.updateHelmet(data);
-          break;
-        case SocketEvent.WeaponOrToolUpdate:
-          player.updateWeaponOrTool(data);
           break;
         case SocketEvent.PlayerInitialization: {
           const [id, username, x, y, angle] = data;
 
           nearbyPlayers[id] = new Player({
+            id,
             scene: this,
             username,
             x,
@@ -264,35 +284,8 @@ export async function initializeGame(
           }
           break;
         }
-        // TODO: Stream using peer to peer
-        case SocketEvent.MovementUpdateOther: {
-          const [id, x, y] = data;
-          if (id in nearbyPlayers) {
-            nearbyPlayers[id].targetX = x;
-            nearbyPlayers[id].targetY = y;
-          }
-          break;
-        }
-        // TODO: Stream using peer to peer
-        case SocketEvent.RotateOther: {
-          const [id, angle] = data;
-          if (id in nearbyPlayers) {
-            nearbyPlayers[id].targetAngle = angle;
-          }
-          break;
-        }
         case SocketEvent.AttackOther: {
           attack(data);
-          break;
-        }
-        case SocketEvent.HelmetUpdateOther: {
-          const [id, item] = data;
-          if (id in nearbyPlayers) nearbyPlayers[id].updateHelmet(item);
-          break;
-        }
-        case SocketEvent.WeaponOrToolUpdateOther: {
-          const [id, item] = data;
-          if (id in nearbyPlayers) nearbyPlayers[id].updateWeaponOrTool(item);
           break;
         }
         case SocketEvent.Chat: {
