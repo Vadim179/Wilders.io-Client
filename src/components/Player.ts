@@ -8,6 +8,7 @@ import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCateg
 import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
 import { lerp } from "../helpers/lerp";
 import { lerpAngle } from "../helpers/lerpAngle";
+import { Stat } from "../enums/statEnum";
 
 interface PlayerConstructorParams
   extends Omit<SpriteConstructorParams, "texture" | "id"> {
@@ -56,6 +57,12 @@ export class Player extends Phaser.GameObjects.Container {
   weaponOrTool: Phaser.GameObjects.Sprite | null = null;
 
   chatBubbles: ChatBubble[] = [];
+
+  stats = {
+    [Stat.Health]: 100,
+    [Stat.Temperature]: 100,
+    [Stat.Hunger]: 100,
+  };
 
   constructor({
     id,
@@ -125,6 +132,18 @@ export class Player extends Phaser.GameObjects.Container {
       this.bodySprite,
       this.tintSprite,
     ]);
+  }
+
+  updateStats(stats: number[]) {
+    const [health, temperature, hunger] = stats;
+
+    this.stats = {
+      [Stat.Health]: health,
+      [Stat.Temperature]: temperature,
+      [Stat.Hunger]: hunger,
+    };
+
+    return this;
   }
 
   private renderUsername(username: string) {
@@ -263,6 +282,8 @@ export class Player extends Phaser.GameObjects.Container {
       this.add(this.helmet);
       this.helmetItem = helmet;
     }
+
+    return this;
   }
 
   updateWeaponOrTool(weaponOrTool: Item | null) {
@@ -289,6 +310,8 @@ export class Player extends Phaser.GameObjects.Container {
       this.leftArmSprite.addAt(this.weaponOrTool);
       this.weaponOrToolItem = weaponOrTool;
     }
+
+    return this;
   }
 
   update() {

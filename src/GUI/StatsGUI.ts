@@ -1,12 +1,7 @@
 import { Sprite } from "../components/Sprite";
+import { Stat } from "../enums/statEnum";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
-
-enum Stat {
-  Hunger = 0,
-  Temperature = 1,
-  Health = 2,
-}
 
 const statBarOptions = {
   [Stat.Health]: {

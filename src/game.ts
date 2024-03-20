@@ -63,7 +63,9 @@ export async function initializeGame(
     const { chatBox, chatInput } = createChatGUI();
 
     // Create other players
-    otherPlayers.forEach(([id, username, x, y, angle]) => {
+    otherPlayers.forEach((data) => {
+      const [id, username, x, y, angle, weaponOrTool, helmet, ...stats] = data;
+
       nearbyPlayers[id] = new Player({
         id,
         scene: this,
@@ -72,7 +74,13 @@ export async function initializeGame(
         y,
         isOtherPlayer: true,
       });
-      nearbyPlayers[id].setRotation(angle);
+
+      nearbyPlayers[id].targetAngle = angle;
+      nearbyPlayers[id]
+        .setAngle(angle)
+        .updateHelmet(helmet)
+        .updateWeaponOrTool(weaponOrTool)
+        .updateStats(stats);
     });
 
     // Movement
@@ -231,31 +239,8 @@ export async function initializeGame(
           );
 
           dataChunks.forEach((playerPayload) => {
-            let thisId: number;
-            let x: number;
-            let y: number;
-            let angle: number;
-            let weaponOrTool: Item | null;
-            let helmet: Item | null;
-            let stats: number[];
-
-            if (playerPayload.length === 9) {
-              [thisId, x, y, angle, weaponOrTool, helmet, ...stats] =
-                playerPayload;
-            } else {
-              [thisId, angle, weaponOrTool, helmet, ...stats] = playerPayload;
-            }
-
-            console.log(
-              playerPayload,
-              thisId,
-              x,
-              y,
-              angle,
-              weaponOrTool,
-              helmet,
-              stats,
-            );
+            const [thisId, x, y, angle, weaponOrTool, helmet, ...stats] =
+              playerPayload;
 
             let thisPlayer: Player | null = null;
 
@@ -266,10 +251,8 @@ export async function initializeGame(
             }
 
             if (thisPlayer) {
-              if (typeof x !== "undefined" && typeof y !== "undefined") {
-                thisPlayer.targetX = x;
-                thisPlayer.targetY = y;
-              }
+              thisPlayer.targetX = x;
+              thisPlayer.targetY = y;
               thisPlayer.targetAngle = angle;
 
               if (weaponOrTool !== thisPlayer.weaponOrToolItem)
@@ -277,9 +260,8 @@ export async function initializeGame(
               if (helmet !== thisPlayer.helmetItem)
                 thisPlayer.updateHelmet(helmet);
 
-              if (thisPlayer === player) {
-                statsGUI.updateStats(stats);
-              }
+              thisPlayer.updateStats(stats);
+              if (thisPlayer === player) statsGUI.updateStats(stats);
             }
           });
           break;
