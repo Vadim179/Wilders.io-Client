@@ -9,17 +9,14 @@ export class MiniMap {
   constructor(scene: Phaser.Scene, canvasWidth: number, canvasHeight: number) {
     this.scene = scene;
 
-    // Set mini-map dimensions
     this.miniMapWidth = 200;
     this.miniMapHeight = 200;
 
-    // Create mini-map graphics
     this.miniMapGraphics = this.scene.add
       .graphics()
       .setScrollFactor(0)
       .setDepth(TextureRenderingOrderEnum.UI);
 
-    // Position mini-map at the bottom right corner of the window
     const miniMapX = innerWidth - this.miniMapWidth - 20;
     const miniMapY = innerHeight - this.miniMapHeight - 20;
 
