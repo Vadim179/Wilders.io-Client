@@ -29,8 +29,6 @@ export class Player extends Phaser.GameObjects.Container {
   targetAngle = 0;
   isOtherPlayer = false;
 
-  equipedItem: Phaser.GameObjects.Sprite;
-
   usernameTextOffset = { x: 0, y: -60 };
   chatBubbleOffset = { x: 0, y: -90 };
   armSpriteOffset = { x: 45, y: -20 };
@@ -51,7 +49,10 @@ export class Player extends Phaser.GameObjects.Container {
   tintSprite: Phaser.GameObjects.Ellipse;
   tintTween: Phaser.Tweens.Tween;
 
+  helmetItem: Item | null = null;
   helmet: Phaser.GameObjects.Sprite | null = null;
+
+  weaponOrToolItem: Item | null = null;
   weaponOrTool: Phaser.GameObjects.Sprite | null = null;
 
   chatBubbles: ChatBubble[] = [];
@@ -245,6 +246,7 @@ export class Player extends Phaser.GameObjects.Container {
     if (this.helmet !== null) {
       this.helmet.destroy();
       this.helmet = null;
+      this.helmetItem = null;
     }
 
     if (helmet !== null) {
@@ -259,6 +261,7 @@ export class Player extends Phaser.GameObjects.Container {
       });
 
       this.add(this.helmet);
+      this.helmetItem = helmet;
     }
   }
 
@@ -266,6 +269,7 @@ export class Player extends Phaser.GameObjects.Container {
     if (this.weaponOrTool !== null) {
       this.weaponOrTool.destroy();
       this.weaponOrTool = null;
+      this.weaponOrToolItem = null;
     }
 
     if (weaponOrTool !== null) {
@@ -283,6 +287,7 @@ export class Player extends Phaser.GameObjects.Container {
 
       this.weaponOrTool.setAngle(offset.angle);
       this.leftArmSprite.addAt(this.weaponOrTool);
+      this.weaponOrToolItem = weaponOrTool;
     }
   }
 

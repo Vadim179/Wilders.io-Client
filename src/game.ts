@@ -14,6 +14,7 @@ import { encodeMovement } from "./helpers/encodeMovement";
 import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
 import { createChatGUI } from "./GUI/ChatGUI";
 import { MiniMap } from "./GUI/MiniMapGUI";
+import { Item } from "./enums/itemEnum";
 
 export async function initializeGame(
   socket: WebSocket,
@@ -230,8 +231,31 @@ export async function initializeGame(
           );
 
           dataChunks.forEach((playerPayload) => {
-            const [thisId, x, y, angle, weaponOrTool, helmet, ...stats] =
-              playerPayload;
+            let thisId: number;
+            let x: number;
+            let y: number;
+            let angle: number;
+            let weaponOrTool: Item | null;
+            let helmet: Item | null;
+            let stats: number[];
+
+            if (playerPayload.length === 9) {
+              [thisId, x, y, angle, weaponOrTool, helmet, ...stats] =
+                playerPayload;
+            } else {
+              [thisId, angle, weaponOrTool, helmet, ...stats] = playerPayload;
+            }
+
+            console.log(
+              playerPayload,
+              thisId,
+              x,
+              y,
+              angle,
+              weaponOrTool,
+              helmet,
+              stats,
+            );
 
             let thisPlayer: Player | null = null;
 
@@ -242,13 +266,16 @@ export async function initializeGame(
             }
 
             if (thisPlayer) {
-              thisPlayer.targetX = x;
-              thisPlayer.targetY = y;
+              if (typeof x !== "undefined" && typeof y !== "undefined") {
+                thisPlayer.targetX = x;
+                thisPlayer.targetY = y;
+              }
               thisPlayer.targetAngle = angle;
 
-              if (weaponOrTool !== thisPlayer.weaponOrTool)
+              if (weaponOrTool !== thisPlayer.weaponOrToolItem)
                 thisPlayer.updateWeaponOrTool(weaponOrTool);
-              if (helmet !== thisPlayer.helmet) thisPlayer.updateHelmet(helmet);
+              if (helmet !== thisPlayer.helmetItem)
+                thisPlayer.updateHelmet(helmet);
 
               if (thisPlayer === player) {
                 statsGUI.updateStats(stats);
