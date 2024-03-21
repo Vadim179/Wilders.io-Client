@@ -3,7 +3,7 @@ import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 import { Slot } from "../types/inventoryTypes";
-import { SocketEvent } from "../enums/socketEvent";
+import { ClientSocketEvent } from "../enums/socketEvent";
 import { sendBinaryDataToServer } from "../helpers/sendBinaryDataToServer";
 
 class InventorySlotGUI extends Phaser.GameObjects.Container {
@@ -113,7 +113,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     const slot = this.slots[slotIndex];
 
     if (slot[0] !== null) {
-      sendBinaryDataToServer(this.socket, SocketEvent.UseItem, slotIndex);
+      sendBinaryDataToServer(this.socket, ClientSocketEvent.UseItem, slotIndex);
     }
   }
 
@@ -158,7 +158,11 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
           ) {
             const slot = this.slots[index];
             if (slot[0] !== null)
-              sendBinaryDataToServer(this.socket, SocketEvent.UseItem, index);
+              sendBinaryDataToServer(
+                this.socket,
+                ClientSocketEvent.UseItem,
+                index,
+              );
           }
         });
       },
