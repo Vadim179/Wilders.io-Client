@@ -225,17 +225,6 @@ export async function initializeGame(
       };
 
       const entities = map.getEntitiesInRange(attackPosition, attackRadius);
-      const players = map.getPlayersInRange(attackPosition, attackRadius, {
-        ...otherPlayers,
-        [id]: player,
-      });
-
-      players.forEach((targetPlayer) => {
-        if (targetPlayer !== attackingPlayer) {
-          targetPlayer.playDamageAnimation();
-        }
-      });
-
       entities.forEach((body) => map.resourceAttack(body.id, angle));
       attackingPlayer.playAttackAnimation();
     }
@@ -326,7 +315,15 @@ export async function initializeGame(
             if (mobId in mobs) {
               mobs[mobId].targetX = targetX;
               mobs[mobId].targetY = targetY;
-              mobs[mobId].health = health;
+
+              mobs[mobId].updateHealth(health);
+              mobs[mobId].healthBar.update();
+
+              const targetAngle =
+                Math.atan2(targetY - mobs[mobId].y, targetX - mobs[mobId].x) *
+                  (180 / Math.PI) -
+                90;
+              mobs[mobId].targetAngle = targetAngle;
             }
           });
 

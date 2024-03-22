@@ -22,6 +22,11 @@ const weaponOrToolCategoryToOffsetMap = {
   [WeaponOrToolCategory.Sword]: { x: 0, y: -30, angle: 0 },
 };
 
+const regenerationColor = 0x00ff00;
+const damageColor = 0xff0000;
+const lowTemperatureColor = 0x0000ff;
+const hungerColor = 0xffff00;
+
 export class Player extends Phaser.GameObjects.Container {
   id: number;
 
@@ -119,7 +124,7 @@ export class Player extends Phaser.GameObjects.Container {
       0,
       this.bodySprite.displayWidth,
       this.bodySprite.displayHeight,
-      0xff0000,
+      0x000000,
       0,
     );
 
@@ -136,6 +141,18 @@ export class Player extends Phaser.GameObjects.Container {
 
   updateStats(stats: number[]) {
     const [health, temperature, hunger] = stats;
+
+    if (this.stats[Stat.Health] > health) {
+      if (hunger === 0) {
+        this.playOverlayPulseAnimation(hungerColor);
+      } else if (temperature === 0) {
+        this.playOverlayPulseAnimation(lowTemperatureColor);
+      } else {
+        this.playOverlayPulseAnimation(damageColor);
+      }
+    } else if (this.stats[Stat.Health] < health) {
+      this.playOverlayPulseAnimation(regenerationColor);
+    }
 
     this.stats = {
       [Stat.Health]: health,
@@ -242,10 +259,9 @@ export class Player extends Phaser.GameObjects.Container {
     this.chatBubbles.unshift(chatBubble);
   }
 
-  playDamageAnimation() {
-    if (this.tintTween) {
-      return;
-    }
+  playOverlayPulseAnimation(tintColor = 0xff0000) {
+    if (this.tintTween) return;
+    this.tintSprite.fillColor = tintColor;
 
     this.tintTween = this.scene.tweens.add({
       targets: this.tintSprite,
