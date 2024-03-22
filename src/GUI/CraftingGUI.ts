@@ -4,7 +4,7 @@ import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 import { Slot } from "../types/inventoryTypes";
 import { Texture } from "../enums/textureEnum";
-import { SocketEvent } from "../enums/socketEvent";
+import { ClientSocketEvent } from "../enums/socketEvent";
 import { sendBinaryDataToServer } from "../helpers/sendBinaryDataToServer";
 
 export class CraftingGUI extends Phaser.GameObjects.Container {
@@ -12,10 +12,7 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
   itemGap = 20;
   clickEventAbortController: AbortController;
 
-  constructor(
-    scene: Phaser.Scene,
-    private socket: WebSocket,
-  ) {
+  constructor(scene: Phaser.Scene, private socket: WebSocket) {
     super(scene, 0, 0);
     scene.add.existing(this);
     this.slots = new Array(8).fill([null, 0]);
@@ -84,7 +81,11 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
             event.clientY < bounds.y + bounds.height
           ) {
             const recipe = recipes[index];
-            sendBinaryDataToServer(this.socket, SocketEvent.Craft, recipe.item);
+            sendBinaryDataToServer(
+              this.socket,
+              ClientSocketEvent.Craft,
+              recipe.item,
+            );
           }
         });
       },

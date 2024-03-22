@@ -1,5 +1,5 @@
 import { initializeGame } from "./game";
-import { SocketEvent } from "./enums/socketEvent";
+import { ClientSocketEvent, ServerSocketEvent } from "./enums/socketEvent";
 import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
 import { spawners } from "./config/map";
 import { sendBinaryDataToServer } from "./helpers/sendBinaryDataToServer";
@@ -83,7 +83,7 @@ export function initializeMainMenu() {
     socket.binaryType = "arraybuffer";
 
     socket.onopen = function () {
-      sendBinaryDataToServer(socket, SocketEvent.Join, username);
+      sendBinaryDataToServer(socket, ClientSocketEvent.Join, username);
     };
 
     socket.onclose = function (event) {
@@ -95,15 +95,15 @@ export function initializeMainMenu() {
     };
 
     socket.onmessage = function (event) {
-      const [eventName, [spawnerIndex, id, otherPlayers]] =
+      const [eventName, [spawnerIndex, id, otherPlayers, mobs]] =
         decodeBinaryDataFromServer(event.data);
 
-      if (eventName === SocketEvent.Init) {
+      if (eventName === ServerSocketEvent.GameInit) {
         socket.onmessage = null;
         const { x, y } = spawners[spawnerIndex];
 
         hideMenu();
-        initializeGame(socket, id, username, x, y, otherPlayers);
+        initializeGame(socket, id, username, x, y, otherPlayers, mobs);
       }
     };
   });

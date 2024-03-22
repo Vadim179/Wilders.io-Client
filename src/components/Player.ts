@@ -8,9 +8,11 @@ import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCateg
 import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
 import { lerp } from "../helpers/lerp";
 import { lerpAngle } from "../helpers/lerpAngle";
+import { Stat } from "../enums/statEnum";
 
 interface PlayerConstructorParams
-  extends Omit<SpriteConstructorParams, "texture"> {
+  extends Omit<SpriteConstructorParams, "texture" | "id"> {
+  id: number;
   username: string;
   isOtherPlayer?: boolean;
 }
@@ -20,13 +22,18 @@ const weaponOrToolCategoryToOffsetMap = {
   [WeaponOrToolCategory.Sword]: { x: 0, y: -30, angle: 0 },
 };
 
+const regenerationColor = 0x00ff00;
+const damageColor = 0xff0000;
+const lowTemperatureColor = 0x0000ff;
+const hungerColor = 0xffff00;
+
 export class Player extends Phaser.GameObjects.Container {
+  id: number;
+
   targetX = 0;
   targetY = 0;
   targetAngle = 0;
   isOtherPlayer = false;
-
-  equipedItem: Phaser.GameObjects.Sprite;
 
   usernameTextOffset = { x: 0, y: -60 };
   chatBubbleOffset = { x: 0, y: -90 };
@@ -48,12 +55,22 @@ export class Player extends Phaser.GameObjects.Container {
   tintSprite: Phaser.GameObjects.Ellipse;
   tintTween: Phaser.Tweens.Tween;
 
+  helmetItem: Item | null = null;
   helmet: Phaser.GameObjects.Sprite | null = null;
+
+  weaponOrToolItem: Item | null = null;
   weaponOrTool: Phaser.GameObjects.Sprite | null = null;
 
   chatBubbles: ChatBubble[] = [];
 
+  stats = {
+    [Stat.Health]: 100,
+    [Stat.Temperature]: 100,
+    [Stat.Hunger]: 100,
+  };
+
   constructor({
+    id,
     scene,
     x,
     y,
@@ -62,6 +79,7 @@ export class Player extends Phaser.GameObjects.Container {
   }: PlayerConstructorParams) {
     super(scene, x, y, []);
 
+    this.id = id;
     this.targetX = x;
     this.targetY = y;
     this.isOtherPlayer = isOtherPlayer;
@@ -106,7 +124,7 @@ export class Player extends Phaser.GameObjects.Container {
       0,
       this.bodySprite.displayWidth,
       this.bodySprite.displayHeight,
-      0xff0000,
+      0x000000,
       0,
     );
 
@@ -119,6 +137,30 @@ export class Player extends Phaser.GameObjects.Container {
       this.bodySprite,
       this.tintSprite,
     ]);
+  }
+
+  updateStats(stats: number[]) {
+    const [health, temperature, hunger] = stats;
+
+    if (this.stats[Stat.Health] > health) {
+      if (hunger === 0) {
+        this.playOverlayPulseAnimation(hungerColor);
+      } else if (temperature === 0) {
+        this.playOverlayPulseAnimation(lowTemperatureColor);
+      } else {
+        this.playOverlayPulseAnimation(damageColor);
+      }
+    } else if (this.stats[Stat.Health] < health) {
+      this.playOverlayPulseAnimation(regenerationColor);
+    }
+
+    this.stats = {
+      [Stat.Health]: health,
+      [Stat.Temperature]: temperature,
+      [Stat.Hunger]: hunger,
+    };
+
+    return this;
   }
 
   private renderUsername(username: string) {
@@ -217,10 +259,9 @@ export class Player extends Phaser.GameObjects.Container {
     this.chatBubbles.unshift(chatBubble);
   }
 
-  playDamageAnimation() {
-    if (this.tintTween) {
-      return;
-    }
+  playOverlayPulseAnimation(tintColor = 0xff0000) {
+    if (this.tintTween) return;
+    this.tintSprite.fillColor = tintColor;
 
     this.tintTween = this.scene.tweens.add({
       targets: this.tintSprite,
@@ -240,6 +281,7 @@ export class Player extends Phaser.GameObjects.Container {
     if (this.helmet !== null) {
       this.helmet.destroy();
       this.helmet = null;
+      this.helmetItem = null;
     }
 
     if (helmet !== null) {
@@ -254,13 +296,17 @@ export class Player extends Phaser.GameObjects.Container {
       });
 
       this.add(this.helmet);
+      this.helmetItem = helmet;
     }
+
+    return this;
   }
 
   updateWeaponOrTool(weaponOrTool: Item | null) {
     if (this.weaponOrTool !== null) {
       this.weaponOrTool.destroy();
       this.weaponOrTool = null;
+      this.weaponOrToolItem = null;
     }
 
     if (weaponOrTool !== null) {
@@ -278,7 +324,10 @@ export class Player extends Phaser.GameObjects.Container {
 
       this.weaponOrTool.setAngle(offset.angle);
       this.leftArmSprite.addAt(this.weaponOrTool);
+      this.weaponOrToolItem = weaponOrTool;
     }
+
+    return this;
   }
 
   update() {

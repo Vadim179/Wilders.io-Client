@@ -9,22 +9,24 @@ export class MiniMap {
   constructor(scene: Phaser.Scene, canvasWidth: number, canvasHeight: number) {
     this.scene = scene;
 
-    // Set mini-map dimensions
     this.miniMapWidth = 200;
     this.miniMapHeight = 200;
 
-    // Create mini-map graphics
     this.miniMapGraphics = this.scene.add
       .graphics()
       .setScrollFactor(0)
       .setDepth(TextureRenderingOrderEnum.UI);
 
-    // Position mini-map at the bottom right corner of the window
-    const miniMapX = canvasWidth - this.miniMapWidth - 20;
-    const miniMapY = canvasHeight - this.miniMapHeight - 20;
+    const miniMapX = innerWidth - this.miniMapWidth - 20;
+    const miniMapY = innerHeight - this.miniMapHeight - 20;
 
     this.miniMapGraphics.x = miniMapX;
     this.miniMapGraphics.y = miniMapY;
+
+    window.addEventListener("resize", () => {
+      this.miniMapGraphics.x = innerWidth - this.miniMapWidth - 20;
+      this.miniMapGraphics.y = innerHeight - this.miniMapHeight - 20;
+    });
 
     this.miniMapGraphics.fillStyle(0x000000, 1);
     this.miniMapGraphics.fillRect(0, 0, this.miniMapWidth, this.miniMapHeight);

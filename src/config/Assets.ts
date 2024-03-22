@@ -65,4 +65,5 @@ export const assets = Object.freeze({
   [Texture.HungerIcon]: "hunger-icon.png",
   [Texture.HealthIcon]: "health-icon.png",
   [Texture.TemperatureIcon]: "temperature-icon.png",
+  [Texture.Wolf]: "wolf.svg",
 });
