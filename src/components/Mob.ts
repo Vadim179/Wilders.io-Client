@@ -16,7 +16,7 @@ const mobTagToTextureMap = {
 };
 
 export const mobInitialHealthMap = {
-  [MobTag.Wolf]: 50,
+  [MobTag.Wolf]: 300,
   // [MobTag.Rabbit]: 10,
 };
 
@@ -138,6 +138,7 @@ export class Mob extends Phaser.GameObjects.Container {
 class MobHealthBar extends Phaser.GameObjects.Container {
   barContainer: Phaser.GameObjects.Graphics;
   bar: Phaser.GameObjects.Graphics;
+  barWidth = 50;
 
   constructor(scene: Phaser.Scene, private mob: Mob) {
     super(scene, 0, 0);
@@ -146,18 +147,24 @@ class MobHealthBar extends Phaser.GameObjects.Container {
     this.setDepth(TextureRenderingOrderEnum.MobHealthBar);
   }
 
+  calculateHealthBarWidth() {
+    return (
+      (this.mob.health * this.barWidth) / mobInitialHealthMap[this.mob.mobTag]
+    );
+  }
+
   create() {
     const { scene } = this;
 
     this.barContainer = scene.add
       .graphics()
       .fillStyle(0x000000, 0.75)
-      .fillRoundedRect(0, 0, 60, 15, 7.5);
+      .fillRoundedRect(0, 0, this.barWidth + 10, 15, 7.5);
 
     this.bar = scene.add
       .graphics()
       .fillStyle(0x00ff00, 1)
-      .fillRoundedRect(5, 5, 50, 5, 2.5);
+      .fillRoundedRect(5, 5, this.barWidth, 5, 2.5);
 
     this.add([this.barContainer, this.bar]);
   }
@@ -168,10 +175,10 @@ class MobHealthBar extends Phaser.GameObjects.Container {
     this.x = mob.x + mob.healthBarOffset.x - 30;
     this.y = mob.y + mob.healthBarOffset.y;
 
-    const healthPercentage = mob.health / mobInitialHealthMap[mob.mobTag];
+    const healthBarWidth = this.calculateHealthBarWidth();
     this.bar.clear();
     this.bar
       .fillStyle(0x00ff00, 1)
-      .fillRoundedRect(5, 5, 50 * healthPercentage, 5, 2.5);
+      .fillRoundedRect(5, 5, healthBarWidth, 5, 2.5);
   }
 }

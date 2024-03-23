@@ -64,7 +64,7 @@ export class Player extends Phaser.GameObjects.Container {
   chatBubbles: ChatBubble[] = [];
 
   stats = {
-    [Stat.Health]: 100,
+    [Stat.Health]: 200,
     [Stat.Temperature]: 100,
     [Stat.Hunger]: 100,
   };

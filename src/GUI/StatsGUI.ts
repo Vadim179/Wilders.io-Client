@@ -7,19 +7,22 @@ const statBarOptions = {
   [Stat.Health]: {
     color: 0xee3e75,
     iconTexture: Texture.HealthIcon,
+    initialValue: 200,
   },
   [Stat.Hunger]: {
     color: 0xba5c41,
     iconTexture: Texture.HungerIcon,
+    initialValue: 100,
   },
   [Stat.Temperature]: {
     color: 0xa5c7df,
     iconTexture: Texture.TemperatureIcon,
+    initialValue: 100,
   },
 };
 
 class StatGUI extends Phaser.GameObjects.Container {
-  value = 100;
+  value: number;
   flashTween: Phaser.Tweens.Tween | null = null;
 
   barRectangle: Phaser.GameObjects.Rectangle;
@@ -33,6 +36,7 @@ class StatGUI extends Phaser.GameObjects.Container {
   ) {
     super(scene, x, y, []);
     scene.add.existing(this);
+    this.value = statBarOptions[statType].initialValue;
     this.create();
   }
 
@@ -96,11 +100,12 @@ class StatGUI extends Phaser.GameObjects.Container {
   }
 
   update() {
-    const { value, barRectangleFullWidth } = this;
+    const { value, statType, barRectangleFullWidth } = this;
 
+    const statOptions = statBarOptions[statType];
     this.barRectangle.width = Phaser.Math.Linear(
       this.barRectangle.width,
-      (value / 100) * barRectangleFullWidth,
+      (value / statOptions.initialValue) * barRectangleFullWidth,
       0.05,
     );
     // if value === 0, show skull and crossbones

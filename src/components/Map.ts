@@ -62,7 +62,6 @@ export class GameMap {
         Math.abs(position.x - player.x) <= radius + entityRadius &&
         Math.abs(position.y - player.y) <= radius + entityRadius,
     );
-    console.log(nearbyPlayers);
   }
 
   update(player: Player) {

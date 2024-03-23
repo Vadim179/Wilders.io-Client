@@ -57,19 +57,19 @@ export const mapEntities = Object.freeze([
     radius: 60,
   },
   {
-    texture: Texture.LargeDarkOakTree,
+    texture: Texture.MediumOakTree,
     x: 500,
     y: 250,
     id: "tree-1",
-    order: TextureRenderingOrderEnum.LargeDarkOakTree,
+    order: TextureRenderingOrderEnum.MediumOakTree,
     radius: 70,
   },
   {
-    texture: Texture.LargeOakTree,
+    texture: Texture.HumongousOakTree,
     x: 650,
     y: 150,
     id: "tree-2",
-    order: TextureRenderingOrderEnum.LargeOakTree,
+    order: TextureRenderingOrderEnum.HumongousOakTree,
     radius: 120,
   },
 ]);
