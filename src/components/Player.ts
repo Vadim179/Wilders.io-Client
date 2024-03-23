@@ -285,10 +285,10 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     if (helmet !== null) {
-      const { texture } = inventoryItemOptionsMap[helmet];
+      const { equipableItemTexture } = inventoryItemOptionsMap[helmet];
 
       this.helmet = new Sprite({
-        texture,
+        texture: equipableItemTexture,
         scene: this.scene,
         order: TextureRenderingOrderEnum.Helmet,
         x: 0,
@@ -310,12 +310,12 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     if (weaponOrTool !== null) {
-      const { texture } = inventoryItemOptionsMap[weaponOrTool];
+      const { equipableItemTexture } = inventoryItemOptionsMap[weaponOrTool];
       const category = itemToWeaponOrToolCategoryMap[weaponOrTool];
       const offset = weaponOrToolCategoryToOffsetMap[category];
 
       this.weaponOrTool = new Sprite({
-        texture,
+        texture: equipableItemTexture,
         scene: this.scene,
         order: TextureRenderingOrderEnum.WeaponOrTool,
         x: offset.x,
