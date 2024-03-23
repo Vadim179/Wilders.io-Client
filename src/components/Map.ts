@@ -44,11 +44,10 @@ export class GameMap {
   }
 
   getEntitiesInRange(position: Position, radius: number) {
-    const entityRadius = 60;
     return this.surroundingEntities.filter(
       (entity) =>
-        Math.abs(position.x - entity.x) <= radius + entityRadius &&
-        Math.abs(position.y - entity.y) <= radius + entityRadius,
+        Math.abs(position.x - entity.x) <= radius + entity.radius &&
+        Math.abs(position.y - entity.y) <= radius + entity.radius,
     );
   }
 
