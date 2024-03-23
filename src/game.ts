@@ -14,9 +14,7 @@ import { encodeMovement } from "./helpers/encodeMovement";
 import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
 import { createChatGUI } from "./GUI/ChatGUI";
 import { MiniMap } from "./GUI/MiniMapGUI";
-import { Sprite } from "./components/Sprite";
 import { Mob } from "./components/Mob";
-import { Texture } from "./enums/textureEnum";
 
 export async function initializeGame(
   socket: WebSocket,
@@ -211,9 +209,10 @@ export async function initializeGame(
     // Attack
     let isAttacking = false;
     function attack(otherPlayerId?: number) {
-      const attackingPlayer = otherPlayerId
-        ? otherPlayers[otherPlayerId]
-        : player;
+      const attackingPlayer =
+        typeof otherPlayerId === "undefined"
+          ? player
+          : otherPlayers[otherPlayerId];
 
       const attackDistance = attackingPlayer.weaponOrTool ? 60 : 40;
       const attackRadius = attackingPlayer.weaponOrTool ? 50 : 40;
@@ -330,6 +329,8 @@ export async function initializeGame(
           break;
         }
         case ServerSocketEvent.Attack:
+          attack();
+          break;
         case ServerSocketEvent.AttackOther: {
           attack(data);
           break;

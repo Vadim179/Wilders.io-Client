@@ -29,7 +29,6 @@ export enum TextureRenderingOrderEnum {
   WolfTint,
   Rabbit,
   MobHealthBar,
-  Username,
   AppleTree,
   Apple,
   SmallDarkOakTree,
@@ -38,6 +37,7 @@ export enum TextureRenderingOrderEnum {
   MediumOakTree,
   LargeDarkOakTree,
   LargeOakTree,
+  Username,
   ChatBubble,
   UI,
 }

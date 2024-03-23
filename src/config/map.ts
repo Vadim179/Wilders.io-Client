@@ -11,6 +11,7 @@ export const mapDecorations = Object.freeze([
     y: 100,
     id: "hill-1",
     order: TextureRenderingOrderEnum.LargeHill,
+    radius: 20,
   },
   {
     texture: Texture.Pebble,
@@ -18,6 +19,7 @@ export const mapDecorations = Object.freeze([
     y: 200,
     id: "pebble-1",
     order: TextureRenderingOrderEnum.Pebble,
+    radius: 20,
   },
   {
     texture: Texture.LargePinkFlower,
@@ -25,6 +27,7 @@ export const mapDecorations = Object.freeze([
     y: 300,
     id: "flower-1",
     order: TextureRenderingOrderEnum.LargePinkFlower,
+    radius: 20,
   },
   {
     texture: Texture.SmallWhiteFlower,
@@ -32,6 +35,7 @@ export const mapDecorations = Object.freeze([
     y: 400,
     id: "flower-2",
     order: TextureRenderingOrderEnum.SmallWhiteFlower,
+    radius: 20,
   },
   {
     texture: Texture.LargeWhiteFlower,
@@ -39,6 +43,7 @@ export const mapDecorations = Object.freeze([
     y: 450,
     id: "flower-3",
     order: TextureRenderingOrderEnum.LargeWhiteFlower,
+    radius: 20,
   },
 ]);
 
@@ -49,6 +54,7 @@ export const mapEntities = Object.freeze([
     y: 50,
     id: "stone-1",
     order: TextureRenderingOrderEnum.LargeRock,
+    radius: 60,
   },
   {
     texture: Texture.LargeDarkOakTree,
@@ -56,6 +62,7 @@ export const mapEntities = Object.freeze([
     y: 250,
     id: "tree-1",
     order: TextureRenderingOrderEnum.LargeDarkOakTree,
+    radius: 70,
   },
   {
     texture: Texture.LargeOakTree,
@@ -63,5 +70,6 @@ export const mapEntities = Object.freeze([
     y: 150,
     id: "tree-2",
     order: TextureRenderingOrderEnum.LargeOakTree,
+    radius: 120,
   },
 ]);
