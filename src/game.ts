@@ -329,7 +329,8 @@ export async function initializeGame(
 
           break;
         }
-        case ServerSocketEvent.Attack: {
+        case ServerSocketEvent.Attack:
+        case ServerSocketEvent.AttackOther: {
           attack(data);
           break;
         }
@@ -360,8 +361,29 @@ export async function initializeGame(
           }
           break;
         }
-        case ServerSocketEvent.AttackOther: {
-          attack(data);
+        case ServerSocketEvent.MobInitialization: {
+          const [mobTag, id, x, y] = data;
+          const mobId = `${mobTag}-${id}`;
+
+          mobs[mobId] = new Mob({
+            id,
+            scene: this,
+            mobTag,
+            x,
+            y,
+            targetX: x,
+            targetY: y,
+          });
+          break;
+        }
+        case ServerSocketEvent.MobRemove: {
+          const [mobTag, id] = data;
+          const mobId = `${mobTag}-${id}`;
+
+          if (mobId in mobs) {
+            mobs[mobId].destroy();
+            delete mobs[mobId];
+          }
           break;
         }
         case ServerSocketEvent.Chat: {
