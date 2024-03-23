@@ -15,6 +15,7 @@ import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer
 import { createChatGUI } from "./GUI/ChatGUI";
 import { MiniMap } from "./GUI/MiniMapGUI";
 import { Mob } from "./components/Mob";
+import { toolRangeAndRadiusMap } from "./config/toolRangeAndRadiusMap";
 
 export async function initializeGame(
   socket: WebSocket,
@@ -214,8 +215,12 @@ export async function initializeGame(
           ? player
           : otherPlayers[otherPlayerId];
 
-      const attackDistance = attackingPlayer.weaponOrTool ? 60 : 40;
-      const attackRadius = attackingPlayer.weaponOrTool ? 50 : 40;
+      const attackDistance = attackingPlayer.weaponOrTool
+        ? toolRangeAndRadiusMap[attackingPlayer.weaponOrToolItem].toolRange
+        : 40;
+      const attackRadius = attackingPlayer.weaponOrTool
+        ? toolRangeAndRadiusMap[attackingPlayer.weaponOrToolItem].toolRadius
+        : 40;
       const angle = attackingPlayer.rotation - (90 * Math.PI) / 180;
 
       const attackPosition = {
