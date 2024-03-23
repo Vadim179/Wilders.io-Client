@@ -34,4 +34,12 @@ export const inventoryItemOptionsMap = {
     name: "Stone Pickaxe",
     texture: Texture.StonePickaxeItem,
   },
+  [Item.WolfFur]: {
+    name: "Wolf Fur",
+    texture: Texture.WolfFur,
+  },
+  [Item.RawMeat]: {
+    name: "Raw Meat",
+    texture: Texture.RawMeat,
+  },
 };
