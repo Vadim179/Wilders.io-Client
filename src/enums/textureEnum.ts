@@ -64,4 +64,6 @@ export enum Texture {
   HealthIcon = "HEALTH_ICON",
   TemperatureIcon = "TEMPERATURE_ICON",
   Wolf = "WOLF",
+  RawMeat = "RAW_MEAT",
+  WolfFur = "WOLF_FUR",
 }

@@ -24,8 +24,8 @@ interface MobConstructorParams
   extends Omit<SpriteConstructorParams, "texture"> {
   targetX: number;
   targetY: number;
-  health: number;
   mobTag: MobTag;
+  health?: number;
 }
 
 export class Mob extends Phaser.GameObjects.Container {
@@ -56,8 +56,8 @@ export class Mob extends Phaser.GameObjects.Container {
 
     this.targetX = targetX;
     this.targetY = targetY;
-    this.health = health;
     this.mobTag = mobTag;
+    this.health = health ?? mobInitialHealthMap[mobTag];
 
     this.create();
     this.setDepth(mobTagToTextureRenderingOrderMap[this.mobTag]);
@@ -125,6 +125,13 @@ export class Mob extends Phaser.GameObjects.Container {
     this.angle = lerpAngle(this.angle, this.targetAngle, angleLerpFactor);
 
     this.healthBar.update();
+  }
+
+  destroy() {
+    this.healthBar.destroy();
+    this.bodySprite.destroy();
+    this.pulseOverlaySprite.destroy();
+    super.destroy();
   }
 }
 

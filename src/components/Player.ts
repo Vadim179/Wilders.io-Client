@@ -3,12 +3,12 @@ import { Position } from "../types/mapTypes";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 import { Item } from "../enums/itemEnum";
-import { itemTextureMap } from "../config/itemToTextureMap";
 import { itemToWeaponOrToolCategoryMap } from "../config/itemToWeaponOrToolCategoryMap";
 import { WeaponOrToolCategory } from "../enums/weaponOrToolCategory";
 import { lerp } from "../helpers/lerp";
 import { lerpAngle } from "../helpers/lerpAngle";
 import { Stat } from "../enums/statEnum";
+import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 
 interface PlayerConstructorParams
   extends Omit<SpriteConstructorParams, "texture" | "id"> {
@@ -285,10 +285,10 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     if (helmet !== null) {
-      const texture = itemTextureMap[helmet];
+      const { equipableItemTexture } = inventoryItemOptionsMap[helmet];
 
       this.helmet = new Sprite({
-        texture,
+        texture: equipableItemTexture,
         scene: this.scene,
         order: TextureRenderingOrderEnum.Helmet,
         x: 0,
@@ -310,12 +310,12 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     if (weaponOrTool !== null) {
-      const texture = itemTextureMap[weaponOrTool];
+      const { equipableItemTexture } = inventoryItemOptionsMap[weaponOrTool];
       const category = itemToWeaponOrToolCategoryMap[weaponOrTool];
       const offset = weaponOrToolCategoryToOffsetMap[category];
 
       this.weaponOrTool = new Sprite({
-        texture,
+        texture: equipableItemTexture,
         scene: this.scene,
         order: TextureRenderingOrderEnum.WeaponOrTool,
         x: offset.x,
