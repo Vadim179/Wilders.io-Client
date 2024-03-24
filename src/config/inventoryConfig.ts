@@ -28,7 +28,7 @@ export const inventoryItemOptionsMap: Record<Item, InventoryItemOptions> = {
     name: "Wood Helmet",
     texture: Texture.WoodHelmet,
     equipableItemTexture: Texture.WoodHelmet,
-    placement: { x: 2.5, y: 20 },
+    placement: { x: 0, y: -5 },
   },
   [Item.Stone]: {
     name: "Stone",
