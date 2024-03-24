@@ -1,7 +1,14 @@
 import { Item } from "../enums/itemEnum";
 import { Texture } from "../enums/textureEnum";
 
-export const inventoryItemOptionsMap = {
+interface InventoryItemOptions {
+  name: string;
+  texture: Texture;
+  equipableItemTexture: Texture | null;
+  placement?: { x: number; y: number };
+}
+
+export const inventoryItemOptionsMap: Record<Item, InventoryItemOptions> = {
   [Item.Wood]: {
     name: "Wood",
     texture: Texture.Wood,
@@ -19,8 +26,9 @@ export const inventoryItemOptionsMap = {
   },
   [Item.WoodHelmet]: {
     name: "Wood Helmet",
-    texture: Texture.CopperHelmet,
-    equipableItemTexture: Texture.CopperHelmet,
+    texture: Texture.WoodHelmet,
+    equipableItemTexture: Texture.WoodHelmet,
+    placement: { x: 2.5, y: 20 },
   },
   [Item.Stone]: {
     name: "Stone",
@@ -34,8 +42,9 @@ export const inventoryItemOptionsMap = {
   },
   [Item.StoneHelmet]: {
     name: "Stone Helmet",
-    texture: Texture.GoldHelmet,
-    equipableItemTexture: Texture.GoldHelmet,
+    texture: Texture.StoneHelmet,
+    equipableItemTexture: Texture.StoneHelmet,
+    placement: { x: 0, y: 21 },
   },
   [Item.StonePickaxe]: {
     name: "Stone Pickaxe",
@@ -51,5 +60,50 @@ export const inventoryItemOptionsMap = {
     name: "Raw Meat",
     texture: Texture.RawMeat,
     equipableItemTexture: null,
+  },
+  [Item.IronPickaxe]: {
+    name: "Iron Pickaxe",
+    texture: Texture.IronPickaxeItem,
+    equipableItemTexture: Texture.IronPickaxe,
+  },
+  [Item.IronSword]: {
+    name: "Iron Sword",
+    texture: Texture.IronSwordItem,
+    equipableItemTexture: Texture.IronSword,
+  },
+  [Item.GoldPickaxe]: {
+    name: "Gold Pickaxe",
+    texture: Texture.GoldPickaxeItem,
+    equipableItemTexture: Texture.GoldPickaxe,
+  },
+  [Item.GoldSword]: {
+    name: "Gold Sword",
+    texture: Texture.GoldSwordItem,
+    equipableItemTexture: Texture.GoldSword,
+  },
+  [Item.DiamondPickaxe]: {
+    name: "Diamond Pickaxe",
+    texture: Texture.GoldPickaxeItem,
+    equipableItemTexture: Texture.GoldPickaxe,
+  },
+  [Item.DiamondSword]: {
+    name: "Diamond Sword",
+    texture: Texture.GoldSwordItem,
+    equipableItemTexture: Texture.GoldSword,
+  },
+  [Item.EmeraldPickaxe]: {
+    name: "Emerald Pickaxe",
+    texture: Texture.GoldPickaxeItem,
+    equipableItemTexture: Texture.GoldPickaxe,
+  },
+  [Item.EmeraldSword]: {
+    name: "Emerald Sword",
+    texture: Texture.GoldSwordItem,
+    equipableItemTexture: Texture.GoldSword,
+  },
+  [Item.Apple]: {
+    name: "Apple",
+    texture: Texture.Apple,
+    equipableItemTexture: Texture.Apple,
   },
 } as const;
