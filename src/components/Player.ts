@@ -380,6 +380,7 @@ export class Player extends Phaser.GameObjects.Container {
     this.rightArmSprite.destroy();
     this.bodySprite.destroy();
     this.usernameText.destroy();
+    this.chatBubbles.forEach((bubble) => bubble.destroy());
     super.destroy();
   }
 }
@@ -504,14 +505,17 @@ class ChatBubble extends Phaser.GameObjects.Container {
               10,
             );
           },
-          onComplete: () => {
-            this.chatBubbleTween.remove();
-            this.chatText.destroy();
-            this.chatBubble.destroy();
-            this.destroy();
-          },
+          onComplete: () => this.destroy(),
         });
       },
     });
+  }
+
+  override destroy() {
+    this.chatTextTween.remove();
+    this.chatBubbleTween.remove();
+    this.chatText.destroy();
+    this.chatBubble.destroy();
+    super.destroy();
   }
 }

@@ -3,6 +3,15 @@ import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
 export const spawners = Object.freeze([{ x: 0, y: 0 }]);
 
+export const ignoredAttackAnimationTextures = [
+  Texture.LargeHill,
+  Texture.Pebble,
+  Texture.SmallPinkFlower,
+  Texture.LargePinkFlower,
+  Texture.SmallWhiteFlower,
+  Texture.LargeWhiteFlower,
+];
+
 // TODO: Generate random rotations
 export const mapDecorations = Object.freeze([
   {

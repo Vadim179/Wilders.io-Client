@@ -176,20 +176,18 @@ class MobHealthBar extends Phaser.GameObjects.Container {
     this.y = mob.y + mob.healthBarOffset.y;
 
     const healthBarWidth = this.calculateHealthBarWidth();
-    this.bar.clear();
-    this.bar
-      .fillStyle(0x00ff00, 1)
-      .fillRoundedRect(5, 5, healthBarWidth, 5, 2.5);
+    const initialMobHealth = mobInitialHealthMap[mob.mobTag];
 
-    const mobHealth = mobInitialHealthMap[mob.mobTag];
-    if (this.mob.health <= mobHealth / 4) {
-      this.bar
-        .fillStyle(0xff0000, 1)
-        .fillRoundedRect(5, 5, healthBarWidth, 5, 2.5);
-    } else if (this.mob.health <= mobHealth / 2) {
-      this.bar
-        .fillStyle(0xffa500, 1)
-        .fillRoundedRect(5, 5, healthBarWidth, 5, 2.5);
-    }
+    this.bar.clear();
+    const barColor =
+      mob.health <= initialMobHealth / 4
+        ? 0xff0000
+        : mob.health <= initialMobHealth / 2
+        ? 0xffa500
+        : 0x00ff00;
+
+    this.bar
+      .fillStyle(barColor, 1)
+      .fillRoundedRect(5, 5, healthBarWidth, 5, 2.5);
   }
 }
