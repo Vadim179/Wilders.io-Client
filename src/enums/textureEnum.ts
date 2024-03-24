@@ -64,4 +64,7 @@ export enum Texture {
   Wolf = "WOLF",
   RawMeat = "RAW_MEAT",
   WolfFur = "WOLF_FUR",
+  WoodHelmet = "WOOD_HELMET",
+  StoneHelmet = "STONE_HELMET",
+  IronHelmet = "IRON_HELMET",
 }
