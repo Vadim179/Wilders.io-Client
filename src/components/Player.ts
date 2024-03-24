@@ -285,14 +285,14 @@ export class Player extends Phaser.GameObjects.Container {
     }
 
     if (helmet !== null) {
-      const options = inventoryItemOptionsMap[helmet];
+      const { equipableItemTexture } = inventoryItemOptionsMap[helmet];
 
       this.helmet = new Sprite({
-        texture: options.equipableItemTexture,
+        texture: equipableItemTexture,
         scene: this.scene,
         order: TextureRenderingOrderEnum.Helmet,
-        x: options.placement?.x || 0,
-        y: options.placement?.y || 0,
+        x: 0,
+        y: -5, // TODO: Fix the sprite, not the position
       });
 
       this.add(this.helmet);
