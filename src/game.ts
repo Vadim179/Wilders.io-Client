@@ -317,17 +317,24 @@ export async function initializeGame(
             const mobId = `${mobTag}-${id}`;
 
             if (mobId in mobs) {
-              mobs[mobId].targetX = targetX;
-              mobs[mobId].targetY = targetY;
+              const mob = mobs[mobId];
 
-              mobs[mobId].updateHealth(health);
-              mobs[mobId].healthBar.update();
+              mob.targetX = targetX;
+              mob.targetY = targetY;
 
-              const targetAngle =
-                Math.atan2(targetY - mobs[mobId].y, targetX - mobs[mobId].x) *
-                  (180 / Math.PI) -
-                90;
-              mobs[mobId].targetAngle = targetAngle;
+              mob.updateHealth(health);
+              mob.healthBar.update();
+
+              if (
+                Math.abs(Math.floor(mob.x) - targetX) > 1 ||
+                Math.abs(Math.floor(mob.y) - targetY) > 1
+              ) {
+                const targetAngle =
+                  Math.atan2(targetY - mob.y, targetX - mob.x) *
+                    (180 / Math.PI) -
+                  90;
+                mob.targetAngle = targetAngle;
+              }
             }
           });
 
