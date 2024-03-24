@@ -57,6 +57,14 @@ export const mapEntities = Object.freeze([
     radius: 60,
   },
   {
+    texture: Texture.SmallRock,
+    x: 250,
+    y: 30,
+    id: "stone-2",
+    order: TextureRenderingOrderEnum.SmallRock,
+    radius: 40,
+  },
+  {
     texture: Texture.MediumOakTree,
     x: 500,
     y: 250,
