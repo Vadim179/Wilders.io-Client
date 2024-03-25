@@ -1,4 +1,4 @@
-import { StaticTexturesEnum } from "../enums/staticTexturesEnum";
+import { ignoredAttackAnimationTextures } from "../config/map";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 
@@ -33,12 +33,7 @@ export class Sprite extends Phaser.GameObjects.Sprite {
   }
 
   attack(angleInRadians) {
-    if (
-      Object.values(StaticTexturesEnum).includes(
-        this.spriteTexture as unknown as StaticTexturesEnum,
-      )
-    )
-      return;
+    if (ignoredAttackAnimationTextures.includes(this.spriteTexture)) return;
 
     this.tween = this.scene.tweens.add({
       targets: this,
