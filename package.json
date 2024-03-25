@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "webpack serve --mode development --hot --no-cache",
-    "build": "webpack --mode production"
+    "build": "webpack --mode production",
+    "format": "prettier --write src/**/*.{ts,html,json}"
   },
   "babel": {
     "presets": [
@@ -34,6 +35,7 @@
     "webpack-dev-server": "^4.7.4"
   },
   "dependencies": {
+    "animate.css": "^4.1.1",
     "msgpack-lite": "^0.1.26",
     "phaser": "^3.55.2",
     "socket.io-client": "^4.5.3",

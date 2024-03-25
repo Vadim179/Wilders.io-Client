@@ -1,5 +1,5 @@
 import { initializeGame } from "./game";
-import { SocketEvent } from "./enums/socketEvent";
+import { ClientSocketEvent, ServerSocketEvent } from "./enums/socketEvent";
 import { decodeBinaryDataFromServer } from "./helpers/decodeBinaryDataFromServer";
 import { spawners } from "./config/map";
 import { sendBinaryDataToServer } from "./helpers/sendBinaryDataToServer";
@@ -14,7 +14,9 @@ const serverSelect = <HTMLElement>(
 const playButton = <HTMLElement>(
   document.querySelector(".main-menu__controls__play-button")
 );
-const notification = <HTMLElement>document.querySelector(".main-menu__notification");
+const notification = <HTMLElement>(
+  document.querySelector(".main-menu__notification")
+);
 const loader = <HTMLElement>document.querySelector(".main-menu__loader");
 
 export function showMenu() {
@@ -72,15 +74,16 @@ export function initializeMainMenu() {
       socket = null;
     }
 
-    if (username === "") username = "unnamed#" + Math.floor(Math.random() * 9999);
+    if (username === "")
+      username = "unnamed#" + Math.floor(Math.random() * 9999);
     else if (username.length > 16) username = username.slice(0, 16);
 
-    // socket = new WebSocket("ws://localhost:8000");
-    socket = new WebSocket("ws://172.86.66.19:8000");
+    socket = new WebSocket("ws://localhost:8000");
+    // socket = new WebSocket("ws://172.86.66.19:8000");
     socket.binaryType = "arraybuffer";
 
     socket.onopen = function () {
-      sendBinaryDataToServer(socket, SocketEvent.Join, username);
+      sendBinaryDataToServer(socket, ClientSocketEvent.Join, username);
     };
 
     socket.onclose = function (event) {
@@ -92,15 +95,15 @@ export function initializeMainMenu() {
     };
 
     socket.onmessage = function (event) {
-      const [eventName, [spawnerIndex, id, otherPlayers]] =
+      const [eventName, [spawnerIndex, id, otherPlayers, mobs]] =
         decodeBinaryDataFromServer(event.data);
 
-      if (eventName === SocketEvent.Init) {
+      if (eventName === ServerSocketEvent.GameInit) {
         socket.onmessage = null;
         const { x, y } = spawners[spawnerIndex];
 
         hideMenu();
-        initializeGame(socket, username, x, y, otherPlayers);
+        initializeGame(socket, id, username, x, y, otherPlayers, mobs);
       }
     };
   });

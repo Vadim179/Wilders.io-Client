@@ -1,10 +1,10 @@
 import * as MsgPack from "msgpack-lite";
-import { SocketEvent } from "../enums/socketEvent";
+import { ClientSocketEvent } from "../enums/socketEvent";
 
 export function sendBinaryDataToServer(
   ws: WebSocket,
-  event: SocketEvent,
-  data?: any
+  event: ClientSocketEvent,
+  data?: any,
 ) {
   if (!ws || ws.readyState !== WebSocket.OPEN) {
     console.error("WebSocket is not open.");

@@ -15,17 +15,17 @@ export const craftingRecipes: readonly CraftingRecipe[] = [
   {
     item: Item.WoodPickaxe,
     quantity: 1,
-    ingredients: [{ item: Item.Wood, quantity: 10 }]
+    ingredients: [{ item: Item.Wood, quantity: 10 }],
   },
   {
     item: Item.WoodSword,
     quantity: 1,
-    ingredients: [{ item: Item.Wood, quantity: 25 }]
+    ingredients: [{ item: Item.Wood, quantity: 25 }],
   },
   {
     item: Item.WoodHelmet,
     quantity: 1,
-    ingredients: [{ item: Item.Wood, quantity: 50 }]
+    ingredients: [{ item: Item.Wood, quantity: 50 }],
   },
   {
     item: Item.StoneHelmet,
@@ -33,8 +33,8 @@ export const craftingRecipes: readonly CraftingRecipe[] = [
     ingredients: [
       { item: Item.Stone, quantity: 50 },
       { item: Item.Wood, quantity: 25 },
-      { item: Item.WoodHelmet, quantity: 1 }
-    ]
+      { item: Item.WoodHelmet, quantity: 1 },
+    ],
   },
   {
     item: Item.StoneSword,
@@ -42,8 +42,8 @@ export const craftingRecipes: readonly CraftingRecipe[] = [
     ingredients: [
       { item: Item.Wood, quantity: 20 },
       { item: Item.Stone, quantity: 15 },
-      { item: Item.WoodSword, quantity: 1 }
-    ]
+      { item: Item.WoodSword, quantity: 1 },
+    ],
   },
   {
     item: Item.StonePickaxe,
@@ -51,7 +51,7 @@ export const craftingRecipes: readonly CraftingRecipe[] = [
     ingredients: [
       { item: Item.Wood, quantity: 10 },
       { item: Item.Stone, quantity: 10 },
-      { item: Item.WoodPickaxe, quantity: 1 }
-    ]
-  }
+      { item: Item.WoodPickaxe, quantity: 1 },
+    ],
+  },
 ];

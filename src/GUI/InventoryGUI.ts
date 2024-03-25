@@ -3,7 +3,7 @@ import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { Texture } from "../enums/textureEnum";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 import { Slot } from "../types/inventoryTypes";
-import { SocketEvent } from "../enums/socketEvent";
+import { ClientSocketEvent } from "../enums/socketEvent";
 import { sendBinaryDataToServer } from "../helpers/sendBinaryDataToServer";
 
 class InventorySlotGUI extends Phaser.GameObjects.Container {
@@ -27,7 +27,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
       x: 0,
       y: 0,
       texture: Texture.Slot,
-      order: TextureRenderingOrderEnum.UI
+      order: TextureRenderingOrderEnum.UI,
     }).setAlpha(0.85);
 
     this.add(this.slotSprite);
@@ -42,14 +42,14 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
         x: 0,
         y: 0,
         texture: options.texture,
-        order: TextureRenderingOrderEnum.UI
+        order: TextureRenderingOrderEnum.UI,
       });
 
       const itemQuantityTextStyle = {
         color: "#ffffff",
         fontSize: "12px",
         fontFamily: "slackey",
-        align: "center"
+        align: "center",
       };
 
       this.itemQuantityText = new Phaser.GameObjects.Text(
@@ -57,7 +57,7 @@ class InventorySlotGUI extends Phaser.GameObjects.Container {
         itemQuantityTextOffset.x,
         itemQuantityTextOffset.y,
         `${amount.toString()}`,
-        itemQuantityTextStyle
+        itemQuantityTextStyle,
       ).setOrigin(0.5);
 
       this.add([this.itemSprite, this.itemQuantityText]);
@@ -96,6 +96,25 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     this.slots = new Array(8).fill([null, 0]);
     scene.add.existing(this);
     this.create();
+    scene.input.keyboard.on("keydown", this.onKeyDown, this);
+  }
+
+  onKeyDown(event: KeyboardEvent) {
+    const key = parseInt(event.key);
+
+    if (!isNaN(key) && key >= 1 && key <= this.slots.length) {
+      const slotIndex = key - 1;
+
+      this.useItemAt(slotIndex);
+    }
+  }
+
+  useItemAt(slotIndex: number) {
+    const slot = this.slots[slotIndex];
+
+    if (slot[0] !== null) {
+      sendBinaryDataToServer(this.socket, ClientSocketEvent.UseItem, slotIndex);
+    }
   }
 
   setGUIPosition() {
@@ -103,7 +122,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
 
     this.setPosition(
       innerWidth / 2 - bounds.width / 2,
-      innerHeight - this.bottomMargin
+      innerHeight - this.bottomMargin,
     );
   }
 
@@ -114,7 +133,7 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
       slotGUI.setPosition(
         index * (slotGUI.slotSprite.width + this.slotGap) +
           slotGUI.slotSprite.width / 2,
-        -slotGUI.slotSprite.height / 2
+        -slotGUI.slotSprite.height / 2,
       );
 
       this.add(slotGUI);
@@ -139,13 +158,17 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
           ) {
             const slot = this.slots[index];
             if (slot[0] !== null)
-              sendBinaryDataToServer(this.socket, SocketEvent.UseItem, index);
+              sendBinaryDataToServer(
+                this.socket,
+                ClientSocketEvent.UseItem,
+                index,
+              );
           }
         });
       },
       {
-        signal: this.clickEventAbortController.signal
-      }
+        signal: this.clickEventAbortController.signal,
+      },
     );
 
     window.addEventListener("resize", () => this.setGUIPosition());
@@ -162,10 +185,9 @@ export class InventoryGUI extends Phaser.GameObjects.Container {
     this.slotGUIs = [];
     this.slots = this.slots.map((slot, index) => {
       const changedSlot = changedSlots.find(
-        (changedSlot) => changedSlot[0] === index
+        (changedSlot) => changedSlot[0] === index,
       );
-
-      return changedSlot ? [changedSlot[1], changedSlot[2]] : slot;
+      return slot && changedSlot ? [changedSlot[1], changedSlot[2]] : slot;
     });
 
     this.removeAll(true);

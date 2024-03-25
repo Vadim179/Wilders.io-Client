@@ -5,5 +5,5 @@ export const itemToWeaponOrToolCategoryMap = {
   [Item.WoodPickaxe]: WeaponOrToolCategory.Pickaxe,
   [Item.WoodSword]: WeaponOrToolCategory.Sword,
   [Item.StonePickaxe]: WeaponOrToolCategory.Pickaxe,
-  [Item.StoneSword]: WeaponOrToolCategory.Sword
+  [Item.StoneSword]: WeaponOrToolCategory.Sword,
 };

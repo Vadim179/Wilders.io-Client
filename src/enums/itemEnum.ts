@@ -7,5 +7,15 @@ export enum Item {
   WoodHelmet,
   StoneHelmet,
   StonePickaxe,
-  StoneSword
+  StoneSword,
+  IronPickaxe,
+  IronSword,
+  GoldPickaxe,
+  GoldSword,
+  DiamondPickaxe,
+  DiamondSword,
+  EmeraldPickaxe,
+  EmeraldSword,
+  RawMeat,
+  WolfFur,
 }

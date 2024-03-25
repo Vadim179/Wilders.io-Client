@@ -4,7 +4,7 @@ import { inventoryItemOptionsMap } from "../config/inventoryConfig";
 import { TextureRenderingOrderEnum } from "../enums/textureRenderingOrderEnum";
 import { Slot } from "../types/inventoryTypes";
 import { Texture } from "../enums/textureEnum";
-import { SocketEvent } from "../enums/socketEvent";
+import { ClientSocketEvent } from "../enums/socketEvent";
 import { sendBinaryDataToServer } from "../helpers/sendBinaryDataToServer";
 
 export class CraftingGUI extends Phaser.GameObjects.Container {
@@ -21,13 +21,15 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
 
   getCraftableRecipes() {
     return craftingRecipes.filter((recipe) =>
-      this.hasIngredients(recipe.ingredients)
+      this.hasIngredients(recipe.ingredients),
     );
   }
 
   hasIngredients(ingredients: Array<InventoryItemStack>) {
     return ingredients.every((ingredient) => {
-      const slot = this.slots.find(([slotItem]) => slotItem === ingredient.item);
+      const slot = this.slots.find(
+        ([slotItem]) => slotItem === ingredient.item,
+      );
       return slot && slot[1] >= ingredient.quantity;
     });
   }
@@ -57,7 +59,7 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
         x,
         y,
         texture: recipeItemOptions.texture,
-        order: TextureRenderingOrderEnum.UI
+        order: TextureRenderingOrderEnum.UI,
       });
 
       sprite.setAlpha(0.75);
@@ -79,13 +81,17 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
             event.clientY < bounds.y + bounds.height
           ) {
             const recipe = recipes[index];
-            sendBinaryDataToServer(this.socket, SocketEvent.Craft, recipe.item);
+            sendBinaryDataToServer(
+              this.socket,
+              ClientSocketEvent.Craft,
+              recipe.item,
+            );
           }
         });
       },
       {
-        signal: this.clickEventAbortController.signal
-      }
+        signal: this.clickEventAbortController.signal,
+      },
     );
 
     this.setPosition(50, 50);
@@ -103,7 +109,7 @@ export class CraftingGUI extends Phaser.GameObjects.Container {
     this.clickEventAbortController.abort();
     this.slots = this.slots.map((slot, index) => {
       const changedSlot = changedSlots.find(
-        (changedSlot) => changedSlot[0] === index
+        (changedSlot) => changedSlot[0] === index,
       );
 
       return changedSlot ? [changedSlot[1], changedSlot[2]] : slot;
